@@ -4,12 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="82c15566-44c3-4314-a9f6-779f32594860" name="变更" comment="create project.">
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/indi/wirsnow/client/ChatClientAPP.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/indi/wirsnow/server/ChatServerAPP.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/indi/wirsnow/swingui/ChatFrame.java" afterDir="false" />
+    <list default="true" id="82c15566-44c3-4314-a9f6-779f32594860" name="变更" comment="Create a new part of the file and modify the file name.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/indi/wirsnow/swingui/ChatFrame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/indi/wirsnow/swingui/ChatFrame.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,7 +70,11 @@
       <workItem from="1670243498959" duration="308000" />
       <workItem from="1670243816722" duration="1668000" />
       <workItem from="1670304830561" duration="7000" />
-      <workItem from="1670382261349" duration="237000" />
+      <workItem from="1670382261349" duration="455000" />
+      <workItem from="1670385695823" duration="7000" />
+      <workItem from="1670385710469" duration="50000" />
+      <workItem from="1670385822676" duration="230000" />
+      <workItem from="1670420666260" duration="451000" />
     </task>
     <task id="LOCAL-00001" summary="create project.">
       <created>1670244220134</created>
@@ -82,7 +83,14 @@
       <option name="project" value="LOCAL" />
       <updated>1670244220134</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Create a new part of the file and modify the file name.">
+      <created>1670382637686</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1670382637686</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -101,6 +109,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="create project." />
-    <option name="LAST_COMMIT_MESSAGE" value="create project." />
+    <MESSAGE value="Create a new part of the file and modify the file name." />
+    <option name="LAST_COMMIT_MESSAGE" value="Create a new part of the file and modify the file name." />
   </component>
 </project>
