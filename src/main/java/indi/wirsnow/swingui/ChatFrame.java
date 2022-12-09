@@ -80,9 +80,10 @@ public class ChatFrame implements ActionListener {
     }
 
     private static void setAreaDefault(@NotNull JTextArea area) {
-        area.setLineWrap(true);  // 设置自动换行
-        area.setWrapStyleWord(true); // 设置断行不断字
-        area.setBackground(Color.WHITE); // 设置聊天记录显示框背景颜色
+        area.setTabSize(4);     // 设置tab键的长度
+        area.setLineWrap(true); // 设置自动换行
+        area.setWrapStyleWord(true);    // 设置断行不断字
+        area.setBackground(Color.WHITE);    // 设置聊天记录显示框背景颜色
         area.setFont(new Font("微软雅黑", Font.PLAIN, 14)); // 设置字体
     }
     public static void addComponent(@NotNull JFrame frame, JComponent component, int gridx, int gridy, int gridwidth, int gridheight, double weightx, double weighty){
