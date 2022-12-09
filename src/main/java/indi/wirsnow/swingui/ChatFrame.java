@@ -1,8 +1,15 @@
 package indi.wirsnow.swingui;
 
+import org.jetbrains.annotations.NotNull;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * @author : wirsnow
@@ -24,51 +31,69 @@ public class ChatFrame implements ActionListener {
     private static final JButton sendAudioButton = new JButton();   // 发送语音按钮
     private static final JButton sendFileButton = new JButton();    // 发送文件按钮
     private static final JButton screenshotsButton = new JButton(); // 截图按钮
-    private static final JTextArea textArea = new JTextArea();      // 聊天记录显示框
-    private static final JScrollPane scrollPane = new JScrollPane(textArea); //滚动条
-    private static final JTextField textField = new JTextField();   // 文字输入框
-    private static final JPanel userListPanel = new JPanel();       // 用户列表面板
+    private static final JTextArea messageArea = new JTextArea();   // 聊天记录显示框
+    private static final JScrollPane messageScrollPane = new JScrollPane(messageArea); //滚动条
+    private static final JTextArea editorArea = new JTextArea();    // 文字输入框
+    private static final JScrollPane editorScrollPane = new JScrollPane(editorArea); //滚动条
+    private static final JToolBar toolBar = new JToolBar();         // 工具栏
     private static String sender;                                   // 发送者
     private static String receiver;                                 // 接收者
     private static String message;                                  // 消息
     private static String time;                                     // 时间
 
+    private static final GridBagLayout gridBagLayout =  new GridBagLayout();  // 设置窗口布局方式
+    private static final GridBagConstraints constraints = new GridBagConstraints(); // 创建约束对象
+
+
     public ChatFrame(){
+        constraints.fill = GridBagConstraints.BOTH; // 设置填充方式
         frame.setSize(800, 600);    // 设置窗口大小
         frame.setLocationRelativeTo(null);  // 设置窗口居中
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 设置窗口关闭方式
-        frame.setLayout(null);  // 设置窗口布局为绝对布局
-        frame.setResizable(false);  // 设置窗口不可改变大小
+        frame.setLayout(gridBagLayout); // 设置窗口布局方式
+        frame.setResizable(true);  // 设置窗口可改变大小
+        frame.setVisible(true); // 设置窗口可见
 
-        sendButton.setBounds(600, 500, 80, 30); // 设置发送按钮位置和大小
-        sendButton.addActionListener(this); // 添加监听事件
-        sendButton.setActionCommand("send"); // 设置监听事件的命令
-        frame.add(sendButton);  // 添加发送按钮
+        // 设置聊天记录显示框
+        setAreaDefault(messageArea);    // 设置消息框格式
+        messageArea.setEditable(false); // 设置不可编辑
+        messageScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // 设置水平滚动条不可见
+        addComponent(frame, messageScrollPane, 0, 2, 1, 1, 0.5, 0.5); // 添加组件
 
-        sendAudioButton.setBounds(700, 500, 80, 30); // 设置发送语音按钮位置和大小
-        sendAudioButton.addActionListener(this); // 添加监听事件
-        sendAudioButton.setActionCommand("sendAudio"); // 设置监听事件的命令
-        frame.add(sendAudioButton); // 添加发送语音按钮
+        // 设置文字输入框
+        setAreaDefault(editorArea);    // 设置输入框格式
+        editorScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // 设置水平滚动条不可见
+        addComponent(frame, editorScrollPane, 0, 4, 1, 1, 0.5, 0.2); // 添加组件
 
-        sendFileButton.setBounds(600, 550, 80, 30); // 设置发送文件按钮位置和大小
-        sendFileButton.addActionListener(this); // 添加监听事件
-        sendFileButton.setActionCommand("sendFile"); // 设置监听事件的命令
-        frame.add(sendFileButton);  // 添加发送文件按钮
+        //设置截图按钮
+        screenshotsButton.setIcon(new ImageIcon("src\\main\\resources\\icons\\screenshots.png")); // 设置按钮图标
+        screenshotsButton.setToolTipText("截图"); // 设置按钮提示
+        screenshotsButton.addActionListener(this);
+        screenshotsButton.setActionCommand("screenshots");
 
-        screenshotsButton.setBounds(700, 550, 80, 30); // 设置截图按钮位置和大小
-        screenshotsButton.addActionListener(this); // 添加监听事件
-        screenshotsButton.setActionCommand("screenshots"); // 设置监听事件的命令
-        frame.add(screenshotsButton);   // 添加截图按钮
+        //将截图、语音、文件按钮添加到工具栏
+        toolBar.add(screenshotsButton);
+        toolBar.add(sendAudioButton);
+        toolBar.add(sendFileButton);
+        toolBar.setSize(800,50);
+        addComponent(frame, toolBar, 0, 3, 1, 1, 0,0); // 添加组件
+    }
 
-        textArea.setBounds(0, 0, 600, 500); // 设置聊天记录显示框位置和大小
-        textArea.setEditable(false);    // 设置聊天记录显示框不可编辑
-        textArea.setLineWrap(true); // 设置自动换行
-        frame.add(scrollPane);  // 添加滚动条
-
-        textField.setBounds(0, 500, 600, 30); // 设置文字输入框位置和大小
-        frame.add(textField);   // 添加文字输入框
-
-        userListPanel.setBounds(600, 0, 200, 500);
+    private static void setAreaDefault(@NotNull JTextArea area) {
+        area.setLineWrap(true);  // 设置自动换行
+        area.setWrapStyleWord(true); // 设置断行不断字
+        area.setBackground(Color.WHITE); // 设置聊天记录显示框背景颜色
+        area.setFont(new Font("微软雅黑", Font.PLAIN, 14)); // 设置字体
+    }
+    public static void addComponent(@NotNull JFrame frame, JComponent component, int gridx, int gridy, int gridwidth, int gridheight, double weightx, double weighty){
+        constraints.gridx = gridx;  // 设置组件所在列
+        constraints.gridy = gridy;  // 设置组件所在行
+        constraints.gridwidth = gridwidth;  // 设置组件所占列数
+        constraints.gridheight = gridheight;    // 设置组件所占行数
+        constraints.weightx = weightx;  // 设置组件在水平方向上的拉伸比例
+        constraints.weighty = weighty;  // 设置组件在垂直方向上的拉伸比例
+        gridBagLayout.setConstraints(component, constraints); // 设置组件
+        frame.add(component);   // 添加组件
     }
     public static void main(String[] args) {
         new ChatFrame();
@@ -76,6 +101,17 @@ public class ChatFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        String result = e.getActionCommand();
+        if (result.equals("screenshots")) {
+            try {
+                Robot robot = new Robot();
+                Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+                BufferedImage image = robot.createScreenCapture(rectangle);
+                ImageIO.write(image, "png", new File("src\\main\\resources\\images\\screenshots.png"));
+            } catch (AWTException | IOException ex) {
+                ex.printStackTrace();
+            }
+        }
 
     }
 }
