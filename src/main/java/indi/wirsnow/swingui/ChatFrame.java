@@ -97,6 +97,7 @@ public class ChatFrame implements ActionListener {
         gridBagLayout.setConstraints(component, constraints); // 设置组件
         frame.add(component);   // 添加组件
     }
+
     public static void main(String[] args) {
         new ChatFrame();
     }
