@@ -69,6 +69,7 @@ public class ChatFrame implements ActionListener {
         screenshotsButton.setIcon(new ImageIcon("src\\main\\resources\\icons\\screenshots.png")); // 设置按钮图标
         screenshotsButton.setToolTipText("截图"); // 设置按钮提示
         screenshotsButton.addActionListener(this);
+
         screenshotsButton.setActionCommand("screenshots");
 
         //将截图、语音、文件按钮添加到工具栏
