@@ -1,5 +1,6 @@
 package indi.wirsnow.swingui.listener;
 
+import indi.wirsnow.swingui.BaseFrame;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -11,13 +12,16 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author : wirsnow
  * @date : 2022/12/10 14:53
  * @description : 聊天框监听器
  */
-public class ChatFrameListener implements ActionListener {
+public class FrameListener implements ActionListener {
 
     /**
      * @param e the event to be processed
@@ -26,6 +30,9 @@ public class ChatFrameListener implements ActionListener {
     public void actionPerformed(@NotNull ActionEvent e) {
         String result = e.getActionCommand();
         switch(result){
+            case "send":
+                send();
+                break;
             case "screenshots":
                 try {
                     screenshots();
@@ -46,6 +53,21 @@ public class ChatFrameListener implements ActionListener {
             default:
                 throw new IllegalStateException("Unexpected value: " + result);
         }
+    }
+    /**
+     * 发送消息
+     */
+    private void send(){
+        Date date = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");    //设置日期格式
+        BaseFrame.time = dateFormat.format(date);
+        BaseFrame.message = BaseFrame.editorArea.getText();   //获取输入框的内容
+        BaseFrame.editorArea.setText("");   //清空输入框
+        if(BaseFrame.message.equals("")){   //如果输入框为空，不发送消息
+            return;
+        }
+        String text = BaseFrame.sender + " "+ BaseFrame.time + "\n" + BaseFrame.message;    //设置聊天记录
+        BaseFrame.messageArea.append(text + "\n");
     }
 
     /**

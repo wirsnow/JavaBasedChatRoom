@@ -16,14 +16,9 @@ public class ServerFrame {
     }
 
     public static void main(String[] args) {
-        new ServerFrame();
+
+        new BaseFrame("小明");
     }
 
-    /**
-     * 构造方法
-     */
-    public ServerFrame() {
-        new ChatFrame();
-    }
 
 }
