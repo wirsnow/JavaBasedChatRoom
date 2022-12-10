@@ -1,3 +1,5 @@
+resources/audio
+resources/images
 target/
 !.mvn/wrapper/maven-wrapper.jar
 out/*

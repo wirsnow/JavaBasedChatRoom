@@ -1,24 +1,18 @@
 package indi.wirsnow.swingui;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
+import indi.wirsnow.swingui.listener.ChatFrameListener;
 import org.jetbrains.annotations.NotNull;
 
-import javax.imageio.ImageIO;
-import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 /**
  * @author : wirsnow
  * @date : 2022/12/7 11:07
- * @description: 实现客户端聊天框显示
+ * @description : 实现客户端聊天框显示
  */
-public class ChatFrame implements ActionListener {
+public class ChatFrame {
     /*
     该类主要利用swing图形化相关技术，设计聊天软件的UI界面，
     UI界面要求至少有一个聊天记录显示框、文字输入框和发送按钮，
@@ -45,14 +39,14 @@ public class ChatFrame implements ActionListener {
     private static String receiver;                                 // 接收者
     private static String message;                                  // 消息
     private static String time;                                     // 时间
-
     private static final GridBagLayout gridBagLayout = new GridBagLayout();  // 设置窗口布局方式
     private static final GridBagConstraints constraints = new GridBagConstraints(); // 创建约束对象
+    private static final ChatFrameListener chatFrameListener = new ChatFrameListener(); // 创建监听器对象
 
-    public static void main(String[] args) {
-        new ChatFrame();
-    }
 
+    /**
+     * 构造方法
+     */
     public ChatFrame() {
         constraints.fill = GridBagConstraints.BOTH; // 设置填充方式
         frame.setSize(600, 500);    // 设置窗口大小
@@ -79,19 +73,19 @@ public class ChatFrame implements ActionListener {
         //设置截图按钮
         autoIcon(screenshotsButton, "src/main/resources/icons/screenshots.png"); // 设置按钮图标
         screenshotsButton.setToolTipText("屏幕截图"); // 设置按钮提示
-        screenshotsButton.addActionListener(this);
+        screenshotsButton.addActionListener(chatFrameListener); // 添加监听器
         screenshotsButton.setActionCommand("screenshots");
 
         // 设置发送语音按钮
         autoIcon(sendAudioButton, "src/main/resources/icons/AudioButton.png"); // 设置按钮图标
         sendAudioButton.setToolTipText("发送语音"); // 设置按钮提示
-        sendAudioButton.addActionListener(this);
+        sendAudioButton.addActionListener(chatFrameListener); // 添加监听器
         sendAudioButton.setActionCommand("sendAudio");
 
         // 设置发送文件按钮
         autoIcon(sendFileButton, "src/main/resources/icons/FileButton.png"); // 设置按钮图标
         sendFileButton.setToolTipText("发送文件");  // 设置按钮提示
-        sendFileButton.addActionListener(this); // 添加监听器
+        sendFileButton.addActionListener(chatFrameListener); // 添加监听器
         sendFileButton.setActionCommand("sendFile");    // 设置按钮命令
 
         //将截图、语音、文件按钮添加到工具栏
@@ -101,8 +95,17 @@ public class ChatFrame implements ActionListener {
         toolBar.setMaximumSize(new Dimension(200, 25));
         toolBar.setMinimumSize(new Dimension(200, 25));
         addComponent(frame, toolBar, 0, 1, 1, 1, 1, 0); // 添加组件
+
+        sendButton.setMinimumSize(new Dimension(100, 25));
+        addComponent(frame, sendButton, 0, 3, 1, 1, 1, 0); // 添加组件
     }
 
+    /**
+     * 设置按钮图标
+     *
+     * @param button   按钮
+     * @param iconPath 图标路径
+     */
     private static void autoIcon(@NotNull JButton button, String iconPath) {
         ImageIcon icon = new ImageIcon(iconPath);
         Image img = icon.getImage();
@@ -110,6 +113,11 @@ public class ChatFrame implements ActionListener {
         button.setIcon(new ImageIcon(newImg));
     }
 
+    /**
+     * 设置文本框的默认格式
+     *
+     * @param area 文本框
+     */
     private static void setAreaDefault(@NotNull JTextArea area) {
         area.setTabSize(4);     // 设置tab键的长度
         area.setLineWrap(true); // 设置自动换行
@@ -118,7 +126,19 @@ public class ChatFrame implements ActionListener {
         area.setFont(new Font("微软雅黑", Font.PLAIN, 14)); // 设置字体
     }
 
-    public static void addComponent(@NotNull JFrame frame, JComponent component, int gridx, int gridy, int gridwidth, int gridheight, double weightx, double weighty) {
+    /**
+     * 添加组件
+     *
+     * @param frame      窗口
+     * @param component  组件
+     * @param gridx      组件所在列
+     * @param gridy      组件所在行
+     * @param gridwidth  组件所占列数
+     * @param gridheight 组件所占行数
+     * @param weightx    x方向权重
+     * @param weighty    y方向权重
+     */
+    private static void addComponent(@NotNull JFrame frame, JComponent component, int gridx, int gridy, int gridwidth, int gridheight, double weightx, double weighty) {
         constraints.gridx = gridx;  // 设置组件所在列
         constraints.gridy = gridy;  // 设置组件所在行
         constraints.gridwidth = gridwidth;  // 设置组件所占列数
@@ -131,63 +151,7 @@ public class ChatFrame implements ActionListener {
         frame.add(component);   // 添加组件
     }
 
-    private AudioFormat getAudioFormat() {
-        float sampleRate = 8000F;
-        // 8000,11025,16000,22050,44100 采样率
-        int sampleSizeInBits = 16;
-        // 8,16 每个样本中的位数
-        int channels = 2;
-        // 1,2 信道数（单声道为 1，立体声为 2，等等）
-        boolean signed = true;
-        // true,false
-        boolean bigEndian = false;
-        // true,false 指示是以 big-endian 顺序还是以 little-endian 顺序存储音频数据。
-        return new AudioFormat(sampleRate, sampleSizeInBits, channels, signed,
-                bigEndian);//构造具有线性 PCM 编码和给定参数的 AudioFormat。
-    }
-
-
-    @Override
-    public void actionPerformed(@NotNull ActionEvent e) {
-        String result = e.getActionCommand();
-        if (result.equals("screenshots")) {
-            try {
-                Robot robot = new Robot();
-                Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-                BufferedImage image = robot.createScreenCapture(rectangle);
-                ImageIO.write(image, "png", new File("src\\main\\resources\\images\\screenshots.png"));
-            } catch (AWTException | IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-        if (result.equals("sendAudio")) {
-            try {
-                AudioFormat format = getAudioFormat();
-                DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
-                TargetDataLine targetDataLine = (TargetDataLine) AudioSystem.getLine(info);
-                targetDataLine.open(format);
-                targetDataLine.start();
-                AudioInputStream audioInputStream = new AudioInputStream(targetDataLine);
-                AudioFileFormat.Type fileType = AudioFileFormat.Type.WAVE;
-                File audioFile = new File("src\\main\\resources\\audio\\audio.wav");
-                AudioSystem.write(audioInputStream, fileType, audioFile);
-                targetDataLine.close();
-            } catch (LineUnavailableException | IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-        if (result.equals("sendFile")) {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-            fileChooser.showDialog(new JLabel(), "选择");
-            File file = fileChooser.getSelectedFile();
-            if (file.isDirectory()) {
-                System.out.println("文件夹:" + file.getAbsolutePath());
-            } else if (file.isFile()) {
-                System.out.println("文件:" + file.getAbsolutePath());
-            }
-            System.out.println("文件名:" + file.getName());
-        }
-
+    public static void main(String[] args){
+        new ChatFrame();
     }
 }
