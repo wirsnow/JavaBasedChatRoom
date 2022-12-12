@@ -1,6 +1,5 @@
 package indi.wirsnow.swingui.listener;
 
-import indi.wirsnow.swingui.BaseFrame;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -21,7 +20,17 @@ import java.util.Date;
  * @date : 2022/12/10 14:53
  * @description : 聊天框监听器
  */
-public class FrameListener implements ActionListener {
+public class BaseFrameListener implements ActionListener {
+
+    private final JTextArea editorArea;
+    private final JTextArea messageArea;
+    private final String sender;
+
+    public BaseFrameListener(JTextArea editorArea, JTextArea messageArea, String sender) {
+        this.editorArea = editorArea;
+        this.messageArea = messageArea;
+        this.sender = sender;
+    }
 
     /**
      * @param e the event to be processed
@@ -59,15 +68,15 @@ public class FrameListener implements ActionListener {
      */
     private void send(){
         Date date = new Date();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");    //设置日期格式
-        BaseFrame.time = dateFormat.format(date);
-        BaseFrame.message = BaseFrame.editorArea.getText();   //获取输入框的内容
-        BaseFrame.editorArea.setText("");   //清空输入框
-        if(BaseFrame.message.equals("")){   //如果输入框为空，不发送消息
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
+        String time = dateFormat.format(date);
+        String message = editorArea.getText();   //获取输入框的内容
+        editorArea.setText("");   //清空输入框
+        if(message.equals("")){   //如果输入框为空，不发送消息
             return;
         }
-        String text = BaseFrame.sender + " "+ BaseFrame.time + "\n" + BaseFrame.message;    //设置聊天记录
-        BaseFrame.messageArea.append(text + "\n");
+        String text = sender + " "+ time + "\n" + message;    //设置聊天记录
+        messageArea.append(text + "\n");
     }
 
     /**
