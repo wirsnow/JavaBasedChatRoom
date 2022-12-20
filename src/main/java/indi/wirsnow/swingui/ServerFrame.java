@@ -17,7 +17,7 @@ public class ServerFrame {
 
     public static void main(String[] args) {
 
-        new BaseFrame("小明");
+        new ChatFrame("小明");
     }
 
 

@@ -20,13 +20,13 @@ import java.util.Date;
  * @date : 2022/12/10 14:53
  * @description : 聊天框监听器
  */
-public class BaseFrameListener implements ActionListener {
+public class ChatFrameListener implements ActionListener {
 
     private final JTextArea editorArea;
     private final JTextArea messageArea;
     private final String sender;
 
-    public BaseFrameListener(JTextArea editorArea, JTextArea messageArea, String sender) {
+    public ChatFrameListener(JTextArea editorArea, JTextArea messageArea, String sender) {
         this.editorArea = editorArea;
         this.messageArea = messageArea;
         this.sender = sender;
@@ -38,31 +38,27 @@ public class BaseFrameListener implements ActionListener {
     @Override
     public void actionPerformed(@NotNull ActionEvent e) {
         String result = e.getActionCommand();
-        switch(result){
-            case "send":
-                send();
-                break;
-            case "screenshots":
+        switch (result) {
+            case "send" -> send();
+            case "screenshots" -> {
                 try {
                     screenshots();
                 } catch (AWTException | IOException ex) {
                     throw new RuntimeException(ex);
                 }
-                break;
-            case "sendAudio":
+            }
+            case "sendAudio" -> {
                 try {
                     sendAudio();
                 } catch (LineUnavailableException | IOException ex) {
                     throw new RuntimeException(ex);
                 }
-                break;
-            case "sendFile":
-                sendFile();
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + result);
+            }
+            case "sendFile" -> sendFile();
+            default -> throw new IllegalStateException("Unexpected value: " + result);
         }
     }
+
     /**
      * 发送消息
      */
@@ -113,15 +109,19 @@ public class BaseFrameListener implements ActionListener {
      * 发送文件
      */
     private static void sendFile(){
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        fileChooser.showDialog(new JLabel(), "选择");
-        File file = fileChooser.getSelectedFile();
-        if (file.isDirectory()) {
-            System.out.println("文件夹:" + file.getAbsolutePath());
-        } else if (file.isFile()) {
-            System.out.println("文件:" + file.getAbsolutePath());
+        JFileChooser fileChooser = new JFileChooser();  //创建文件选择器
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);   //设置只能选择文件
+        fileChooser.showDialog(new JLabel(), "选择");  //打开文件选择器
+        File file = fileChooser.getSelectedFile();  //获取选择的文件
+        if(file == null){
+            return;
+        } else if (file.length() > 1024 * 1024 * 10) {
+            JOptionPane.showMessageDialog(null, "文件大小不能超过10M", "错误", JOptionPane.ERROR_MESSAGE);
+            return;
         }
-        System.out.println("文件名:" + file.getName());
+        String path = file.getAbsolutePath();   //获取文件路径
+        String name = file.getName();   //获取文件名
+
+
     }
 }
