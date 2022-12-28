@@ -7,7 +7,7 @@ import com.formdev.flatlaf.FlatIntelliJLaf;
  * @date : 2022/12/8 19:37
  * @description:
  */
-public class ServerFrame {
+public class ChatServerFrame {
     /*
       该类主要用于创建服务器端的图形界面
      */
@@ -17,7 +17,7 @@ public class ServerFrame {
 
     public static void main(String[] args) {
 
-        new ChatFrame("小明");
+        new ChatClientFrame("小明");
     }
 
 

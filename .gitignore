@@ -1,11 +1,11 @@
+### Custom ###
 src/main/resources/audio/*
 src/main/resources/images/*
-target/
 !.mvn/wrapper/maven-wrapper.jar
 out/*
 logs/*
 target/*
-*.db
+
 ### IntelliJ IDEA ###
 .idea/*
 *.iws

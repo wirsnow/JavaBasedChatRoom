@@ -1,14 +1,13 @@
 package indi.wirsnow.server;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
  * @author : wirsnow
  * @date : 2022/12/8 19:24
- * @description: 主要用于监听服务器端的端口
+ * @description : 服务端程序启动类
  */
 public class ChatServerAPP {
     /*
@@ -16,14 +15,12 @@ public class ChatServerAPP {
     服务器端可以同时处理多个客户端的信息，当客户端断开连接时，服务器端会自动关闭该客户端的线程。
     */
     public static void main(String[] args) {
-        try (ServerSocket serverSocket = new ServerSocket(56458)) {
-            Socket socket;
-            System.out.println("***服务器即将启动，等待客户端的连接***");
+        try (ServerSocket serverSocket = new ServerSocket(56448)) {
+            System.out.println("服务器已启动，等待客户端连接...");
             while (true) {
-                socket = serverSocket.accept();
-                InetAddress inetAddress = socket.getInetAddress();
-                ServerThread serverThread = new ServerThread(socket, inetAddress);
-                serverThread.start();
+                Socket socket = serverSocket.accept();
+                new Thread(new ChatServerListen(socket)).start();
+                new Thread(new ChatServerOutput(socket)).start();
             }
         } catch (IOException e) {
             e.printStackTrace();

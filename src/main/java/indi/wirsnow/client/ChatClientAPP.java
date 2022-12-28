@@ -1,47 +1,52 @@
 package indi.wirsnow.client;
 
-import java.io.*;
+import indi.wirsnow.swingui.ChatClientFrame;
+
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 
 /**
  * @author : wirsnow
  * @date : 2022/12/7 11:04
- * @description:
+ * @description : 客户端程序启动类
  */
 public class ChatClientAPP {
+    /*
+    1、启动ui界面
+    2、尝试连接服务端
+    3、正常连接后，启动接收线程
+    */
+    private static Socket socket;
+    private static String sender;
+    private static boolean connected = false;
+    private static ObjectOutputStream objectOutputStream;
+
     public static void main(String[] args) {
-        try {
-            Socket socket = new Socket("127.0.0.1", 56458);
-            OutputStream outputStream = socket.getOutputStream();
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+        sender = "wirsnow";
+        new ChatClientFrame(sender);
 
-            System.out.println("输入数据:");
-            Scanner scanner = new Scanner(System.in);
-            String data = scanner.nextLine();
-            outputStreamWriter.write(data);
-            outputStreamWriter.flush();
-            socket.shutdownOutput();
-
-            InputStream inputStream = socket.getInputStream();
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String info;
-
-            System.out.println("客户端ip:" + socket.getInetAddress().getHostAddress());
-
-            while ((info = bufferedReader.readLine()) != null) {
-                System.out.println("客户端接收:" + info);
+        connect();
+        if (connected) {
+            try {
+                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                new Thread(new ChatClientListen(socket)).start();
+                new Thread(new ChatClientOutput(sender,objectOutputStream)).start();
+                new Thread(new ChatClientHeart(objectOutputStream)).start();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            bufferedReader.close();
-            inputStreamReader.close();
-            inputStream.close();
-            outputStreamWriter.close();
-            outputStream.close();
-            socket.close();
-        } catch (IOException e) {
+
+        }
+    }
+
+    private static void connect() {
+        try {
+            socket = new Socket("127.0.0.1", 56448);
+            connected = true;
+        } catch (Exception e) {
             e.printStackTrace();
+            connected = false;
         }
     }
 }
