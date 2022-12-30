@@ -9,18 +9,17 @@ import java.net.Socket;
  * @description : 监听客户端收到的消息
  */
 public class ChatClientListen implements Runnable {
-    private final Socket socket;
+    private final ObjectInputStream ois;
 
-    public ChatClientListen(Socket socket) {
-        this.socket = socket;
+    public ChatClientListen(ObjectInputStream ois) {
+        this.ois = ois;
     }
 
     @Override
     public void run() {
         try {
-            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
             while (true) {
-                System.out.println(objectInputStream.readObject());
+                System.out.println(ois.readObject());
             }
         } catch (Exception e) {
             e.printStackTrace();

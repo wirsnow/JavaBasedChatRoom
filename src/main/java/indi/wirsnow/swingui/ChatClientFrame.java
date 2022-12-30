@@ -27,10 +27,8 @@ public class ChatClientFrame {
     private static final JButton sendAudioButton = new JButton();   // 发送语音按钮
     private static final JButton sendFileButton = new JButton();    // 发送文件按钮
     private static final JButton screenshotsButton = new JButton(); // 截图按钮
-    private static final JTextArea messageArea = new JTextArea();    // 聊天记录显示框
-    private static final JScrollPane messageScrollPane = new JScrollPane(messageArea);  //滚动条
-    private static final JTextArea editorArea = new JTextArea();     // 文字输入框
-    private static final JScrollPane editorScrollPane = new JScrollPane(editorArea);    //滚动条
+    private final JTextArea messageArea;    // 聊天记录显示框
+    private final JTextArea editorArea;     // 文字输入框
     private static final JToolBar toolBar = new JToolBar();         // 工具栏
     private static final GridBagLayout gridBagLayout = new GridBagLayout();     // 设置窗口布局方式
     private static final GridBagConstraints constraints = new GridBagConstraints(); // 创建约束对象
@@ -45,14 +43,16 @@ public class ChatClientFrame {
     /**
      * 构造方法
      */
-    public ChatClientFrame(String sender) {
+    public ChatClientFrame(String sender,JTextArea messageArea,JTextArea editorArea) {
         this.sender = sender;
+        this.messageArea = messageArea;
+        this.editorArea = editorArea;
         init();
     }
 
-    public static void main(String[] args) {
-        new ChatClientFrame("wirsnow");
-    }
+//    public static void main(String[] args) {
+//        new ChatClientFrame("wirsnow");
+//    }
 
     /**
      * 设置工具栏按钮图标
@@ -132,6 +132,11 @@ public class ChatClientFrame {
         gridBagLayout.rowHeights = new int[]{235, 25, 130}; // 设置行高
 
         /*设置显示与输入框*/
+        //滚动条
+        JScrollPane messageScrollPane = new JScrollPane(messageArea);
+        //滚动条
+        JScrollPane editorScrollPane = new JScrollPane(editorArea);
+
         // 设置聊天记录显示框
         setAreaDefault(messageArea);    // 设置消息框格式
         messageArea.setEditable(false); // 设置不可编辑

@@ -3,6 +3,8 @@ package indi.wirsnow.client;
 import com.alibaba.fastjson2.JSONObject;
 
 import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.util.Scanner;
 
 /**
  * @author : wirsnow
@@ -13,11 +15,11 @@ public class ChatClientOutput implements Runnable {
     private static String message;
 
     private final String sender;
-    private final ObjectOutputStream objectOutputStream;
+    private final Socket socket;
 
-    public ChatClientOutput(String sender, ObjectOutputStream objectOutputStream) {
+    public ChatClientOutput(Socket socket, String sender) {
+        this.socket = socket;
         this.sender = sender;
-        this.objectOutputStream = objectOutputStream;
     }
 
     public static void setMessage(String me) {
@@ -27,6 +29,7 @@ public class ChatClientOutput implements Runnable {
     @Override
     public void run() {
         try {
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             while (true) {
                 if(message != null){
                     System.out.println(message);
@@ -36,8 +39,9 @@ public class ChatClientOutput implements Runnable {
                     jsonObject.put("message", message);
                     objectOutputStream.writeObject(jsonObject);
                     objectOutputStream.flush();
+                    message = null;
                 }
-                message = null;
+
             }
         } catch (Exception e) {
             e.printStackTrace();

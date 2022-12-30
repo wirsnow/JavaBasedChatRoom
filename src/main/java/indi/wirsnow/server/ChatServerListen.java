@@ -1,5 +1,6 @@
 package indi.wirsnow.server;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
@@ -21,6 +22,7 @@ public class ChatServerListen implements Runnable {
         try {
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
             while (true) {
+                JOptionPane.showMessageDialog(null, objectInputStream.readObject(), "警告", JOptionPane.WARNING_MESSAGE);
                 System.out.println(objectInputStream.readObject());
             }
         } catch (Exception e) {

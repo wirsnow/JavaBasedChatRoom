@@ -4,6 +4,8 @@ import com.alibaba.fastjson2.JSONObject;
 
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Objects;
+import java.util.Scanner;
 
 /**
  * @author : wirsnow
@@ -12,7 +14,7 @@ import java.net.Socket;
  */
 public class ChatServerOutput implements Runnable {
     private final Socket socket;
-    private final String message = "";
+    private static String message;
 
     public ChatServerOutput(Socket socket) {
         this.socket = socket;
@@ -23,12 +25,16 @@ public class ChatServerOutput implements Runnable {
         try {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             while (true) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("type", "text");
-                jsonObject.put("sender", "server");
-                jsonObject.put("message", message);
-                objectOutputStream.writeObject(jsonObject);
-                objectOutputStream.flush();
+                Scanner scanner = new Scanner(System.in);
+                message = scanner.nextLine();
+                if(!Objects.equals(message, "")) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("type", "text");
+                    jsonObject.put("sender", "server");
+                    jsonObject.put("message", message);
+                    objectOutputStream.writeObject(jsonObject);
+                    objectOutputStream.flush();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

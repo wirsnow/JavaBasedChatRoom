@@ -17,7 +17,7 @@ public class ChatServerFrame {
 
     public static void main(String[] args) {
 
-        new ChatClientFrame("小明");
+
     }
 
 

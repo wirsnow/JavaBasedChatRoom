@@ -79,6 +79,7 @@ public class ChatClientFrameListener implements ActionListener {
             JOptionPane.showMessageDialog(null, "文件大小不能超过10M", "错误", JOptionPane.ERROR_MESSAGE);
             return;
         }
+
         String path = file.getAbsolutePath();   //获取文件路径
         String name = file.getName();   //获取文件名
 
@@ -121,12 +122,13 @@ public class ChatClientFrameListener implements ActionListener {
         String time = dateFormat.format(date);
         String message = editorArea.getText();   //获取输入框的内容
         editorArea.setText("");   //清空输入框
-        if (message.equals("")) {   //如果输入框为空，不发送消息
+        if ("".equals(message)) {   //如果输入框为空，不发送消息
             return;
         }
         String text = sender + " " + time + "\n" + message;    //将消息发送到显示框(本地)
         messageArea.append(text + "\n");
-        ChatClientOutput.setMessage(message);    //将消息发送到服务器
+        objectOutputStream.writeObject(message);
+        objectOutputStream.flush();;    //将消息发送到服务器
 
     }
 }
