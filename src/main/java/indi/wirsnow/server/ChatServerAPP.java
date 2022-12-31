@@ -14,7 +14,7 @@ public class ChatServerAPP {
     /*
     当有客户端连接时，服务器端会自动创建一个线程，用于处理该客户端的信息，
     服务器端可以同时处理多个客户端的信息，当客户端断开连接时，服务器端会自动关闭该客户端的线程。
-    */
+    */ 
     // 线程池
     private static final ExecutorService threadPool = new ThreadPoolExecutor(
             2,

@@ -2,23 +2,18 @@ package indi.wirsnow.swingui;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
 
+import javax.swing.*;
+
 /**
  * @author : wirsnow
- * @date : 2022/12/8 19:37
- * @description:
+ * @date : 2023/1/1 1:19
+ * @description : 用于创建服务端的右侧功能面板
  */
 public class ChatServerFrame {
-    /*
-      该类主要用于创建服务器端的图形界面
-     */
     static {
         FlatIntelliJLaf.setup();
     }
 
-    public static void main(String[] args) {
-
-
+    public ChatServerFrame(JPanel functionPanel) {
     }
-
-
 }

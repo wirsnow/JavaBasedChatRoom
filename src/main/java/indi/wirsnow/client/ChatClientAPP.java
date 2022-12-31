@@ -1,11 +1,8 @@
 package indi.wirsnow.client;
 
-import indi.wirsnow.swingui.ChatClientFrame;
-
 import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 
 /**
@@ -22,7 +19,6 @@ public class ChatClientAPP {
 
     private static Socket socket;
     private static String sender;
-
     private static boolean connected = false;
 
     // 线程池
@@ -36,6 +32,7 @@ public class ChatClientAPP {
             new ThreadPoolExecutor.DiscardOldestPolicy());
 
     public ChatClientAPP() {
+
     }
 
 

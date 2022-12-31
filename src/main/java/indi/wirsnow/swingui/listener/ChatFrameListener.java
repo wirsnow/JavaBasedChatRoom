@@ -1,6 +1,5 @@
 package indi.wirsnow.swingui.listener;
 
-import indi.wirsnow.client.ChatClientOutput;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -12,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,16 +21,18 @@ import java.util.Date;
  * @date : 2022/12/10 14:53
  * @description : 聊天框监听器
  */
-public class ChatClientFrameListener implements ActionListener {
-
-    private final JTextArea editorArea;
+public class ChatFrameListener implements ActionListener {
+    private final String userName;
     private final JTextArea messageArea;
-    private final String sender;
+    private final JTextArea editorArea;
+    private final ObjectOutputStream oos;
 
-    public ChatClientFrameListener(JTextArea editorArea, JTextArea messageArea, String sender) {
-        this.editorArea = editorArea;
+
+    public ChatFrameListener(String userName, JTextArea messageArea, JTextArea editorArea, ObjectOutputStream oos) {
+        this.userName = userName;
         this.messageArea = messageArea;
-        this.sender = sender;
+        this.editorArea = editorArea;
+        this.oos = oos;
     }
 
     /**
@@ -93,7 +95,13 @@ public class ChatClientFrameListener implements ActionListener {
     public void actionPerformed(@NotNull ActionEvent e) {
         String result = e.getActionCommand();
         switch (result) {
-            case "send" -> send();
+            case "send" -> {
+                try {
+                    send();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
             case "screenshots" -> {
                 try {
                     screenshots();
@@ -116,7 +124,7 @@ public class ChatClientFrameListener implements ActionListener {
     /**
      * 发送消息
      */
-    private void send() {
+    private void send() throws IOException {
         Date date = new Date();
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
         String time = dateFormat.format(date);
@@ -125,10 +133,14 @@ public class ChatClientFrameListener implements ActionListener {
         if ("".equals(message)) {   //如果输入框为空，不发送消息
             return;
         }
-        String text = sender + " " + time + "\n" + message;    //将消息发送到显示框(本地)
-        messageArea.append(text + "\n");
-        objectOutputStream.writeObject(message);
-        objectOutputStream.flush();;    //将消息发送到服务器
+        String text = userName + " " + time + "\n" + message;       //拼接消息
+        try {
+            messageArea.append(text + "\n");    //将消息发送到显示框(本地)
+            oos.writeObject(message);   //将消息发送到服务器
+            oos.flush();    //刷新流
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 }

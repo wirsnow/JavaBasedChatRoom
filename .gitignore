@@ -6,6 +6,7 @@ out/*
 logs/*
 target/*
 src/test/java/*
+
 ### IntelliJ IDEA ###
 .idea/*
 *.iws
