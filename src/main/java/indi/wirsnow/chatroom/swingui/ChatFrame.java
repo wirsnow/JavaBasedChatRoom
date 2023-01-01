@@ -17,9 +17,9 @@ import java.util.Map;
  */
 public class ChatFrame {
 
-    private static final JFrame frame = new JFrame("聊天窗口");  // 创建总的窗口
+    protected static final JFrame frame = new JFrame("聊天窗口");  // 创建总的窗口
     private static final JPanel messagePanel = new JPanel();        // 创建左侧聊天面板
-    private static final JPanel functionPanel = new JPanel();       // 创建右侧功能面板
+    protected static final JPanel functionPanel = new JPanel();       // 创建右侧功能面板
     private static final JToolBar toolBar = new JToolBar();             // 工具栏
     private static final JButton sendButton = new JButton("发送");  // 发送按钮
     private static final JButton sendAudioButton = new JButton();       // 发送语音按钮
@@ -34,6 +34,7 @@ public class ChatFrame {
     private final JTextArea messageArea;    // 聊天记录显示框
     private final JTextArea editorArea;     // 文字输入框
     private final Map<String, Socket> map;  // 用户信息
+    private static ObjectOutputStream oos;
 
     /**
      * 构造方法
@@ -121,17 +122,19 @@ public class ChatFrame {
         jPanel.add(component);       // 添加组件
     }
 
+    public static void setOos(ObjectOutputStream oos) {
+        ChatFrame.oos = oos;
+    }
+
     /**
      * 初始化组件
      */
-    void initComponents() throws IOException {
-        Socket socket = map.get(userName);
-        ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-        ChatFrameListener chatFrameListener = new ChatFrameListener(userName, messageArea, editorArea, oos); // 创建监听器对象
+    private void initComponents() throws IOException {
+        ChatFrameListener chatFrameListener = new ChatFrameListener(userName, messageArea, editorArea,oos); // 创建监听器对象
 
         // 窗体整体设置
         frame.setResizable(true);  // 设置窗口可改变大小
-        frame.setSize(800, 500);    // 设置窗口大小
+        frame.setSize(800, 600);    // 设置窗口大小
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 设置窗口关闭方式
         frame.setMinimumSize(new Dimension(500, 500)); // 设置窗口最小大小
         frame.setLocationRelativeTo(null);  // 设置窗口居中
@@ -143,6 +146,7 @@ public class ChatFrame {
             GridBagConstraints gridBagConstraints = new GridBagConstraints();   // 创建网格约束
             messagePanel.setLayout(gridBagLayout);              // 设置布局
             messagePanel.setBorder(BorderFactory.createTitledBorder("聊天记录"));  // 设置边框
+            messagePanel.requestFocus();    // 获取焦点
             gridBagLayout.rowHeights = new int[]{235, 40, 130, 30}; // 设置最小行高
 
             JScrollPane messageScrollPane = new JScrollPane(messageArea);   // 创建滚动条
@@ -175,8 +179,8 @@ public class ChatFrame {
                 toolBar.add(sendAudioButton);
                 toolBar.add(sendFileButton);
                 toolBar.setFloatable(false);
-                toolBar.setMaximumSize(new Dimension(200, 25));
-                toolBar.setMinimumSize(new Dimension(200, 25));
+                toolBar.setMaximumSize(new Dimension(200, 40));
+                toolBar.setMinimumSize(new Dimension(200, 40));
 
                 addGridBagComponent(messagePanel, gridBagLayout, gridBagConstraints, toolBar, 0, 1, 1, 1, 1, 0); // 添加组件
             }
@@ -201,5 +205,6 @@ public class ChatFrame {
         // 右侧功能面板
         functionPanel.setMaximumSize(new Dimension(200, 100000)); // 设置最大大小
         functionPanel.setMinimumSize(new Dimension(150, 400)); // 设置最小大小
+        frame.add(functionPanel, BorderLayout.EAST);    // 添加聊天面板
     }
 }

@@ -35,12 +35,14 @@ public class ChatServerAPP {
                 System.out.println("线程池已满，拒绝执行任务");
             });
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        Map<String, Socket> map = new HashMap<>();
+        new ChatFrame(null, messageArea, editorArea, map);
         try (ServerSocket serverSocket = new ServerSocket(56448)) {
 
             //存取用户信息（用户名和Socket）
-            Map<String, Socket> map = new HashMap<>();
-            new ChatFrame(null, messageArea, editorArea, map);
+
+
             System.out.println("服务器已启动，等待客户端连接...");
 
             while (true) {
