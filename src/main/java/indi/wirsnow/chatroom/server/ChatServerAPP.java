@@ -1,6 +1,6 @@
-package indi.wirsnow.server;
+package indi.wirsnow.chatroom.server;
 
-import indi.wirsnow.swingui.ChatFrame;
+import indi.wirsnow.chatroom.swingui.ChatFrame;
 
 import javax.swing.*;
 import java.io.IOException;

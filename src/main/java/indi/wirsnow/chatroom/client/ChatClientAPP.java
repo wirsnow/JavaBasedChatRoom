@@ -1,4 +1,4 @@
-package indi.wirsnow.client;
+package indi.wirsnow.chatroom.client;
 
 import javax.swing.*;
 import java.io.IOException;

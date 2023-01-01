@@ -1,4 +1,4 @@
-package indi.wirsnow.client;
+package indi.wirsnow.chatroom.client;
 
 import java.io.ObjectInputStream;
 

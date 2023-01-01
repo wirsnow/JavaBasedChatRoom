@@ -1,4 +1,4 @@
-package indi.wirsnow.swingui.listener;
+package indi.wirsnow.chatroom.swingui.listener;
 
 import org.jetbrains.annotations.NotNull;
 

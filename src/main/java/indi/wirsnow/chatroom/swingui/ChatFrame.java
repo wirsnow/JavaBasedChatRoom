@@ -1,7 +1,7 @@
-package indi.wirsnow.swingui;
+package indi.wirsnow.chatroom.swingui;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
-import indi.wirsnow.swingui.listener.ChatFrameListener;
+import indi.wirsnow.chatroom.swingui.listener.ChatFrameListener;
 
 import javax.swing.*;
 import java.awt.*;

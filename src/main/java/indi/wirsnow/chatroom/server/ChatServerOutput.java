@@ -1,4 +1,4 @@
-package indi.wirsnow.server;
+package indi.wirsnow.chatroom.server;
 
 import com.alibaba.fastjson2.JSONObject;
 

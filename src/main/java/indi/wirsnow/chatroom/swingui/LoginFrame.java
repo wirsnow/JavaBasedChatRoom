@@ -1,4 +1,4 @@
-package indi.wirsnow.swingui;
+package indi.wirsnow.chatroom.swingui;
 
 /**
  * @author : wirsnow
