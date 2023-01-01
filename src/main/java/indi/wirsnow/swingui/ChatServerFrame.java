@@ -14,6 +14,11 @@ public class ChatServerFrame {
         FlatIntelliJLaf.setup();
     }
 
+    /**
+     * 构造方法
+     *
+     * @param functionPanel 右侧功能面板
+     */
     public ChatServerFrame(JPanel functionPanel) {
     }
 }

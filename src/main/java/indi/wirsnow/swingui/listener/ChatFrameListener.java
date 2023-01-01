@@ -19,7 +19,7 @@ import java.util.Date;
 /**
  * @author : wirsnow
  * @date : 2022/12/10 14:53
- * @description : 聊天框监听器
+ * @description : ChatFrame的监听器
  */
 public class ChatFrameListener implements ActionListener {
     private final String userName;
