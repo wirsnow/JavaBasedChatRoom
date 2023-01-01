@@ -13,8 +13,8 @@ import java.util.Scanner;
  * @description : 实现服务端发送消息
  */
 public class ChatServerOutput implements Runnable {
-    private final Socket socket;
     private static String message;
+    private final Socket socket;
 
     public ChatServerOutput(Socket socket) {
         this.socket = socket;
@@ -27,7 +27,7 @@ public class ChatServerOutput implements Runnable {
             while (true) {
                 Scanner scanner = new Scanner(System.in);
                 message = scanner.nextLine();
-                if(!Objects.equals(message, "")) {
+                if (!Objects.equals(message, "")) {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("type", "text");
                     jsonObject.put("sender", "server");

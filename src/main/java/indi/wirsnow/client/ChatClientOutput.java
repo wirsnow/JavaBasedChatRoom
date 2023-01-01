@@ -4,7 +4,6 @@ import com.alibaba.fastjson2.JSONObject;
 
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Scanner;
 
 /**
  * @author : wirsnow
@@ -31,7 +30,7 @@ public class ChatClientOutput implements Runnable {
         try {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             while (true) {
-                if(message != null){
+                if (message != null) {
                     System.out.println(message);
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("type", "client");

@@ -1,7 +1,6 @@
 package indi.wirsnow.client;
 
 import java.io.ObjectInputStream;
-import java.net.Socket;
 
 /**
  * @author : wirsnow

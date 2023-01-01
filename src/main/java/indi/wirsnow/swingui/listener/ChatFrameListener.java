@@ -41,7 +41,7 @@ public class ChatFrameListener implements ActionListener {
      * @throws AWTException 截图异常
      * @throws IOException  保存异常
      */
-    private static void screenshots() throws AWTException, IOException {
+    private void screenshots() throws AWTException, IOException {
         Robot robot = new Robot();
         Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
         BufferedImage image = robot.createScreenCapture(rectangle);
@@ -54,7 +54,7 @@ public class ChatFrameListener implements ActionListener {
      * @throws LineUnavailableException 语音异常
      * @throws IOException              保存异常
      */
-    private static void sendAudio() throws LineUnavailableException, IOException {
+    private void sendAudio() throws LineUnavailableException, IOException {
         AudioFormat format = new AudioFormat(8000F, 16, 2, true, false);
         DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
         TargetDataLine targetDataLine = (TargetDataLine) AudioSystem.getLine(info);
@@ -70,22 +70,20 @@ public class ChatFrameListener implements ActionListener {
     /**
      * 发送文件
      */
-    private static void sendFile() {
+    private void sendFile() throws IOException {
         JFileChooser fileChooser = new JFileChooser();  //创建文件选择器
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);   //设置只能选择文件
         fileChooser.showDialog(new JLabel(), "选择");  //打开文件选择器
         File file = fileChooser.getSelectedFile();  //获取选择的文件
         if (file == null) {
             return;
-        } else if (file.length() > 1024 * 1024 * 10) {
-            JOptionPane.showMessageDialog(null, "文件大小不能超过10M", "错误", JOptionPane.ERROR_MESSAGE);
+        } else if (file.length() > 1024 * 1024 * 100) {
+            JOptionPane.showMessageDialog(null, "文件大小不能超过100M", "错误", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
-        String path = file.getAbsolutePath();   //获取文件路径
-        String name = file.getName();   //获取文件名
-
-
+        oos.writeObject("file:" + file);
+        oos.flush();
+        messageArea.append(oos.toString());
     }
 
     /**
@@ -116,7 +114,13 @@ public class ChatFrameListener implements ActionListener {
                     throw new RuntimeException(ex);
                 }
             }
-            case "sendFile" -> sendFile();
+            case "sendFile" -> {
+                try {
+                    sendFile();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
             default -> throw new IllegalStateException("Unexpected value: " + result);
         }
     }
@@ -136,7 +140,7 @@ public class ChatFrameListener implements ActionListener {
         String text = userName + " " + time + "\n" + message;       //拼接消息
         try {
             messageArea.append(text + "\n");    //将消息发送到显示框(本地)
-            oos.writeObject(message);   //将消息发送到服务器
+            oos.writeObject("to://" + userName + "://" + message);   //将消息发送到服务器
             oos.flush();    //刷新流
         } catch (IOException e) {
             throw new RuntimeException(e);

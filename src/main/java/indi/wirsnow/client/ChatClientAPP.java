@@ -1,7 +1,9 @@
 package indi.wirsnow.client;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.*;
 
@@ -17,10 +19,6 @@ public class ChatClientAPP {
     3、正常连接后，启动接收线程
     */
 
-    private static Socket socket;
-    private static String sender;
-    private static boolean connected = false;
-
     // 线程池
     private static final ExecutorService threadPool = new ThreadPoolExecutor(
             2,
@@ -30,6 +28,9 @@ public class ChatClientAPP {
             new LinkedBlockingDeque<>(3),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy());
+    private static Socket socket;
+    private static String sender;
+    private static boolean connected = false;
 
     public ChatClientAPP() {
 

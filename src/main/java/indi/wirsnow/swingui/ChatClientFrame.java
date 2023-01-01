@@ -1,13 +1,9 @@
 package indi.wirsnow.swingui;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
-import indi.wirsnow.swingui.listener.ChatClientFrameListener;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Vector;
 
 /**
  * @author : wirsnow
@@ -33,18 +29,13 @@ public class ChatClientFrame {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 
-
-
     }
-    private static void addUserList(String onlineUser){
+
+    private static void addUserList(String onlineUser) {
         JButton user = new JButton(onlineUser);
 
-        user.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        user.addActionListener(e -> {
 
-
-            }
         });
 
         list.add(user);
