@@ -2,21 +2,21 @@ package indi.wirsnow.chatroom.swingui;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import indi.wirsnow.chatroom.swingui.listener.ChatFocusListener;
+import indi.wirsnow.chatroom.swingui.listener.ChatServerFrameListener;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author : wirsnow
  * @date : 2023/1/1 1:19
  * @description : 用于创建服务端的右侧功能面板
  */
-public class ChatServerFrame extends ChatFrame{
+public class ChatServerFrame extends ChatFrame {
     private final Map<String, Socket> map;
 
     static {
@@ -47,8 +47,10 @@ public class ChatServerFrame extends ChatFrame{
         JTextField ipField = new JTextField("127.0.0.1");
         JTextField portField = new JTextField("56448");
         JTextField userField = new JTextField("当前在线: 0人");  // 在线人数
-        JList<JButton> userList = new JList<>();  // 在线用户列表
+        JList<String> userList = new JList<>();  // 在线用户列表
+        JScrollPane userListPane = new JScrollPane(userList);  // 在线用户列表滚动条
 
+        ChatServerFrameListener listener = new ChatServerFrameListener(ipField, portField);
 
         GridBagLayout gridBagLayout = new GridBagLayout();                  // 创建网格布局
         GridBagConstraints gridBagConstraints = new GridBagConstraints();   // 创建网格约束
@@ -70,7 +72,11 @@ public class ChatServerFrame extends ChatFrame{
 
         // 添加连接与断开按钮
         {
+            connectButton.addActionListener(listener);
+            connectButton.setActionCommand("connect");
             addGridBagComponent(functionPanel, gridBagLayout, gridBagConstraints, connectButton, 0, 1, 1, 1, 1, 0); // 添加组件
+            disconnectButton.addActionListener(listener);
+            disconnectButton.setActionCommand("disconnect");
             addGridBagComponent(functionPanel, gridBagLayout, gridBagConstraints, disconnectButton, 1, 1, 1, 1, 1, 0); // 添加组件
         }
 
@@ -86,13 +92,43 @@ public class ChatServerFrame extends ChatFrame{
         {
             userList.setBackground(Color.WHITE);    // 设置背景颜色
             userList.setFont(new Font("微软雅黑", Font.PLAIN, 14)); // 设置字体
-            userList.setBorder(null);    // 设置无边框
-            addGridBagComponent(functionPanel, gridBagLayout, gridBagConstraints, userList, 0, 3, 2, 1, 1, 1); // 添加组件
+            userList.setBorder(null);               // 设置无边框
+            DefaultListModel<String> dlm = new DefaultListModel<>(); // 创建列表模型
+            dlm.add(0,"所有人");
+            dlm.addAll(map.keySet());   // 添加所有用户
+            userList.setModel(dlm);             // 设置列表数据
+            userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);         // 设置单选模式
+            userList.addListSelectionListener(e -> {
+                if (e.getValueIsAdjusting()) {
+                    // 获取所有被选中的选项索引
+                    int[] indices = userList.getSelectedIndices();
+                    // 获取选项数据的 ListModel
+                    ListModel<String> listModel = userList.getModel();
+                    // 输出选中的选项
+                    System.out.println("选中: " + indices[0] + " = " + listModel.getElementAt(indices[0]));
+                    Socket socket = map.get(listModel.getElementAt(indices[0]));
+                    if (socket != null) {
+                        try {
+                            // 获取输出流
+                            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                        } catch (IOException ioException) {
+                            ioException.printStackTrace();
+                        }
+                    }
+
+                }
+            });
+            addGridBagComponent(functionPanel, gridBagLayout, gridBagConstraints, userListPane, 0, 3, 2, 1, 1, 1); // 添加组件
         }
 
         frame.setVisible(true);
     }
+
     public static void main(String[] args) throws IOException {
-        new ChatServerFrame("服务器", new JTextArea(), new JTextArea(), null);
+        new ChatServerFrame("服务器", new JTextArea(), new JTextArea(), new HashMap<>() {{
+            put("张三", new Socket());
+            put("李四", new Socket());
+            put("王五", new Socket());
+        }});
     }
 }
