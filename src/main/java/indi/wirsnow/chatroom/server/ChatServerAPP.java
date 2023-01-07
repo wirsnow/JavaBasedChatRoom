@@ -1,15 +1,8 @@
 package indi.wirsnow.chatroom.server;
 
-import indi.wirsnow.chatroom.swingui.ChatFrame;
-
 import javax.swing.*;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -37,22 +30,21 @@ public class ChatServerAPP {
             Executors.defaultThreadFactory(),
             (r, executor) -> System.out.println("线程池已满，拒绝连接"));
 
-    public static void main(String[] args) throws IOException {
-        Map<String, Socket> map = new HashMap<>();
-        new ChatFrame(null, messageArea, editorArea, map);
-        try (ServerSocket serverSocket = new ServerSocket(56448)) {
-
-            //存取用户信息（用户名和Socket）
+    public static void main(String[] args) {
 
 
-            System.out.println("服务器已启动，等待客户端连接...");
-
-            while (true) {
-                Socket socket = serverSocket.accept();
-                threadPool.execute(new ChatServerThread(socket, map, messageArea));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        // 创建服务器端的Socket对象
+//        Map<String, Socket> map = new HashMap<>();
+//        try (ServerSocket serverSocket = new ServerSocket(56448)) {
+//            //存取用户信息（用户名和Socket）
+//            System.out.println("服务器已启动，等待客户端连接...");
+//
+//            while (true) {
+//                Socket socket = serverSocket.accept();
+//                threadPool.execute(new ChatServerThread(socket, map, messageArea));
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 }

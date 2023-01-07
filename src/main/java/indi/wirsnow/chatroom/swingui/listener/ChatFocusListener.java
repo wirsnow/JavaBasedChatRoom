@@ -11,8 +11,9 @@ import java.awt.event.FocusListener;
  * @description : 焦点监听
  */
 public class ChatFocusListener implements FocusListener {
-    private String string;
+    private final String string;
     private final JTextField textField;
+
     public ChatFocusListener(JTextField textField, String string) {
         this.textField = textField;
         this.string = string;

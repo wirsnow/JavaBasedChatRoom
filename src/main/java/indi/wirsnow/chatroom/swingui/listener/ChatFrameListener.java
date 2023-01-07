@@ -12,9 +12,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @author : wirsnow
@@ -22,17 +24,37 @@ import java.util.Date;
  * @description : ChatFrame的监听器
  */
 public class ChatFrameListener implements ActionListener {
-    private final String userName;
+    private String userName;
     private final JTextArea messageArea;
     private final JTextArea editorArea;
-    private final ObjectOutputStream oos;
+    private Map<String, Socket> allOnlineUser;
+    private final ObjectOutputStream oos = null;
 
 
-    public ChatFrameListener(String userName, JTextArea messageArea, JTextArea editorArea, ObjectOutputStream oos) {
-        this.userName = userName;
+    public ChatFrameListener(Map<String, Socket> allOnlineUser, JTextArea messageArea, JTextArea editorArea) {
+        this.allOnlineUser = allOnlineUser;
         this.messageArea = messageArea;
         this.editorArea = editorArea;
-        this.oos = oos;
+    }
+
+    public Map<String, Socket> getAllOnlineUser() {
+        return allOnlineUser;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public JTextArea getMessageArea() {
+        return messageArea;
+    }
+
+    public JTextArea getEditorArea() {
+        return editorArea;
     }
 
     /**
@@ -138,6 +160,11 @@ public class ChatFrameListener implements ActionListener {
             return;
         }
         String text = userName + " " + time + "\n" + message;       //拼接消息
+        //如果未连接，提示先连接服务器
+        if (oos == null) {
+            JOptionPane.showMessageDialog(null, "请先连接服务器", "错误", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         try {
             messageArea.append(text + "\n");    //将消息发送到显示框(本地)
             oos.writeObject("to://" + userName + "://" + message);   //将消息发送到服务器

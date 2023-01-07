@@ -1,10 +1,12 @@
 package indi.wirsnow.chatroom.client;
 
+import indi.wirsnow.chatroom.swingui.ChatFrame;
+import indi.wirsnow.chatroom.swingui.listener.ChatFrameListener;
+
 import javax.swing.*;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -28,39 +30,15 @@ public class ChatClientAPP {
             new LinkedBlockingDeque<>(3),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy());
-    private static Socket socket;
-    private static String sender;
-    private static boolean connected = false;
-
-    public ChatClientAPP() {
-
-    }
 
 
-    public static void main(String[] args) throws IOException {
-        sender = "wirsnow";
-        connect();
-        JTextArea messageArea;    // 聊天记录显示框
-        JTextArea editorArea;     // 文字输入框
+    public static void main(String[] args) {
+        JTextArea messageArea = new JTextArea();
+        JTextArea editorArea = new JTextArea();
+        Map<String, Socket> allOnlineUser = new HashMap<>();
+        ChatFrameListener listener = new ChatFrameListener(allOnlineUser, messageArea, editorArea);
+        // 启动ui界面
+        SwingUtilities.invokeLater(() -> new ChatFrame("Client", messageArea, editorArea, listener));
 
-        if (connected) {
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-            try {
-                threadPool.submit(new ChatClientListen(ois));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private static void connect() {
-        try {
-            socket = new Socket("127.0.0.1", 56448);
-            connected = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            connected = false;
-        }
     }
 }
