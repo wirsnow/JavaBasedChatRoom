@@ -103,7 +103,7 @@ public class ChatFrameListener implements ActionListener {
             JOptionPane.showMessageDialog(null, "文件大小不能超过100M", "错误", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        oos.writeObject("file:" + file);
+        oos.writeObject("file://" + file);
         oos.flush();
         messageArea.append(oos.toString());
     }
@@ -155,19 +155,23 @@ public class ChatFrameListener implements ActionListener {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
         String time = dateFormat.format(date);
         String message = editorArea.getText();   //获取输入框的内容
-        editorArea.setText("");   //清空输入框
-        if ("".equals(message)) {   //如果输入框为空，不发送消息
-            return;
-        }
-        String text = userName + " " + time + "\n" + message;       //拼接消息
+
         //如果未连接，提示先连接服务器
         if (oos == null) {
             JOptionPane.showMessageDialog(null, "请先连接服务器", "错误", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        //如果未输入内容，提示先输入内容
+        if ("".equals(message)) {   //如果输入框为空，不发送消息
+            JOptionPane.showMessageDialog(null, "消息不能为空", "错误", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         try {
+            editorArea.setText("");   //清空输入框
+            String text = userName + " " + time + "\n" + message;       //拼接消息
             messageArea.append(text + "\n");    //将消息发送到显示框(本地)
-            oos.writeObject("to://" + userName + "://" + message);   //将消息发送到服务器
+            oos.writeObject("text://" + message);   //将消息发送到服务器
             oos.flush();    //刷新流
         } catch (IOException e) {
             throw new RuntimeException(e);
