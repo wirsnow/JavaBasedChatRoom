@@ -35,10 +35,12 @@ public class ChatClientAPP {
     public static void main(String[] args) {
         JTextArea messageArea = new JTextArea();
         JTextArea editorArea = new JTextArea();
+        JTextField ipField = new JTextField("127.0.0.1");     // IP输入框
+        JTextField portField = new JTextField("56448");       // port输入框
         Map<String, Socket> allOnlineUser = new HashMap<>();
-        ChatFrameListener listener = new ChatFrameListener(allOnlineUser, messageArea, editorArea);
+        ChatFrameListener listener = new ChatFrameListener(allOnlineUser, messageArea, editorArea, ipField, portField);
         // 启动ui界面
-        SwingUtilities.invokeLater(() -> new ChatFrame("Client", messageArea, editorArea, listener));
+        SwingUtilities.invokeLater(() -> new ChatFrame("Client", messageArea, editorArea, listener, ipField, portField));
 
     }
 }

@@ -15,6 +15,8 @@ import java.util.Objects;
 public class ChatFrame {
     private final JTextArea messageArea;    // 聊天记录显示框
     private final JTextArea editorArea;     // 文字输入框
+    private final JTextField ipField;
+    private final JTextField portField;
     private final ChatFrameListener listener; // 监听器
     protected static final JFrame frame = new JFrame("聊天窗口");  // 创建总的窗口
 
@@ -31,10 +33,14 @@ public class ChatFrame {
     public ChatFrame(String signal,
                      JTextArea messageArea,
                      JTextArea editorArea,
-                     ChatFrameListener listener) {
+                     ChatFrameListener listener,
+                     JTextField ipField,
+                     JTextField portField) {
         this.messageArea = messageArea;
         this.editorArea = editorArea;
         this.listener = listener;
+        this.ipField = ipField;
+        this.portField = portField;
         createFrame();
 
         if (Objects.equals(signal, "Client")) {
@@ -58,11 +64,11 @@ public class ChatFrame {
         frame.setLocationRelativeTo(null);  // 设置窗口居中
 
         // 左侧聊天面板
-        ChatLeftPanel chatLeftPanel = new ChatLeftPanel(frame, messageArea, editorArea, listener);
+        ChatLeftPanel chatLeftPanel = new ChatLeftPanel(frame, listener, messageArea, editorArea);
         chatLeftPanel.createLeftPanel();
 
         // 右侧功能面板
-        ChatRightPanel chatRightPanel = new ChatRightPanel(frame, listener);
+        ChatRightPanel chatRightPanel = new ChatRightPanel(frame, listener, ipField, portField);
         chatRightPanel.createRightPanel();
 
     }

@@ -16,20 +16,22 @@ import static indi.wirsnow.chatroom.swingui.util.ChatFrameUtil.addGridBagCompone
  * @description : 右侧功能面板
  */
 public class ChatRightPanel {
-    private final JFrame frame;             // 父窗口
-    private final ChatFrameListener listener; // 监听器
+    private final JFrame frame;                 // 父窗口
+    private final ChatFrameListener listener;   // 监听器
+    private final JTextField ipField;           // IP输入框
+    private final JTextField portField;         // port输入框
     private static final JPanel functionPanel = new JPanel();           // 功能面板
     private final JButton connectButton = new JButton("连接");      // 连接按钮
     private final JButton disconnectButton = new JButton("断开");   // 断开按钮
-    private final JTextField ipField = new JTextField("127.0.0.1");     // IP输入框
-    private final JTextField portField = new JTextField("56448");       // port输入框
     private final JTextField userField = new JTextField("当前在线: 0人"); // 在线人数
     private final JList<String> userList = new JList<>();               // 用户列表
     private final JScrollPane userListPane = new JScrollPane(userList); // 列表滚动条
 
-    public ChatRightPanel(JFrame frame, ChatFrameListener listener) {
+    public ChatRightPanel(JFrame frame, ChatFrameListener listener, JTextField ipField, JTextField portField) {
         this.frame = frame;
         this.listener = listener;
+        this.ipField = ipField;
+        this.portField = portField;
     }
 
 

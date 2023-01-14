@@ -1,5 +1,6 @@
 package indi.wirsnow.chatroom.swingui.listener;
 
+import indi.wirsnow.chatroom.client.ChatClientThread;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -25,16 +26,20 @@ import java.util.Map;
  */
 public class ChatFrameListener implements ActionListener {
     private String userName;
+    private final JTextField ipField;
+    private final JTextField portField;
     private final JTextArea messageArea;
     private final JTextArea editorArea;
-    private Map<String, Socket> allOnlineUser;
     private final ObjectOutputStream oos = null;
+    private final Map<String, Socket> allOnlineUser;
 
 
-    public ChatFrameListener(Map<String, Socket> allOnlineUser, JTextArea messageArea, JTextArea editorArea) {
+    public ChatFrameListener(Map<String, Socket> allOnlineUser, JTextArea messageArea, JTextArea editorArea, JTextField ipField, JTextField portField) {
         this.allOnlineUser = allOnlineUser;
         this.messageArea = messageArea;
         this.editorArea = editorArea;
+        this.ipField = ipField;
+        this.portField = portField;
     }
 
     public Map<String, Socket> getAllOnlineUser() {
@@ -115,13 +120,7 @@ public class ChatFrameListener implements ActionListener {
     public void actionPerformed(@NotNull ActionEvent e) {
         String result = e.getActionCommand();
         switch (result) {
-            case "send" -> {
-                try {
-                    send();
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
+            case "send" -> send();
             case "screenshots" -> {
                 try {
                     screenshots();
@@ -143,14 +142,48 @@ public class ChatFrameListener implements ActionListener {
                     throw new RuntimeException(ex);
                 }
             }
+            case "connect" -> connect();
+            case "disconnect" -> disconnect();
             default -> throw new IllegalStateException("Unexpected value: " + result);
+        }
+    }
+
+    /**
+     * 连接
+     */
+    private void connect() {
+        String ip = ipField.getText();
+        String port = portField.getText();
+        try {
+            Socket socket = new Socket(ip, Integer.parseInt(port));
+            allOnlineUser.put(userName, socket);
+            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.writeObject("connect://" + userName);
+            oos.flush();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "连接失败", "错误", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * 断开连接
+     */
+    private void disconnect() {
+        try {
+            Socket socket = allOnlineUser.get(userName);
+            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.writeObject("disconnect://" + userName);
+            oos.flush();
+            socket.close();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "断开连接失败", "错误", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     /**
      * 发送消息
      */
-    private void send() throws IOException {
+    private void send() {
         Date date = new Date();
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
         String time = dateFormat.format(date);

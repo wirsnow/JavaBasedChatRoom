@@ -25,11 +25,12 @@ public class ChatLeftPanel {
     private static final JButton sendFileButton = new JButton();        // 文件按钮
     private static final JButton screenshotsButton = new JButton();     // 截图按钮
 
-    public ChatLeftPanel(JFrame frame, JTextArea messageArea, JTextArea editorArea, ChatFrameListener listener) {
+    public ChatLeftPanel(JFrame frame, ChatFrameListener listener, JTextArea messageArea, JTextArea editorArea) {
         this.frame = frame;
+        this.listener = listener;
         this.messageArea = messageArea;
         this.editorArea = editorArea;
-        this.listener = listener;
+
     }
 
     public void createLeftPanel() {

@@ -28,9 +28,6 @@ public class ChatFocusListener implements FocusListener {
         }
     }
 
-    /**
-     * @param e the event to be processed
-     */
     @Override
     public void focusLost(FocusEvent e) {
         //失去焦点时，判断文本框内容是否为空，为空则显示提示文字

@@ -12,8 +12,6 @@ import java.awt.*;
  * @description: 实现登录框
  */
 public class ChatLoginFrame {
-    private String userName = null;
-
     public void login(JFrame mFrame, ChatFrameListener listener) {
         JFrame frame = new JFrame("登录");
         JLabel userNameTip = new JLabel("用户名:");
@@ -48,12 +46,14 @@ public class ChatLoginFrame {
         loginButton.setPreferredSize(new Dimension(100, 30));
         loginButton.setVerticalAlignment(SwingConstants.BOTTOM);
         loginButton.addActionListener(e -> {
-            String userName = userNameField.getText();
+            String userName;
+            userName = userNameField.getText();
             if (userName.equals("")) {
                 JOptionPane.showMessageDialog(frame, "用户名不能为空", "错误", JOptionPane.ERROR_MESSAGE);
+            } else if(userName.equals("Server")) {
+                JOptionPane.showMessageDialog(frame, "用户名不能为Server", "错误", JOptionPane.ERROR_MESSAGE);
             } else {
-                this.userName = userName;
-                listener.setUserName(this.userName);
+                listener.setUserName(userName);
                 frame.dispose();
                 mFrame.setVisible(true);
             }
