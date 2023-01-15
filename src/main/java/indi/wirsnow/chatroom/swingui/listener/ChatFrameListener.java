@@ -1,6 +1,8 @@
 package indi.wirsnow.chatroom.swingui.listener;
 
 import indi.wirsnow.chatroom.client.ChatClientThread;
+import indi.wirsnow.chatroom.server.ChatServerThread;
+import indi.wirsnow.chatroom.util.ChatUniversalData;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -18,6 +20,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author : wirsnow
@@ -25,41 +28,17 @@ import java.util.Map;
  * @description : ChatFrame的监听器
  */
 public class ChatFrameListener implements ActionListener {
-    private String userName;
-    private final JTextField ipField;
-    private final JTextField portField;
     private final JTextArea messageArea;
     private final JTextArea editorArea;
-    private final ObjectOutputStream oos = null;
     private final Map<String, Socket> allOnlineUser;
+    private final ChatUniversalData chatUniversalData;
 
 
-    public ChatFrameListener(Map<String, Socket> allOnlineUser, JTextArea messageArea, JTextArea editorArea, JTextField ipField, JTextField portField) {
-        this.allOnlineUser = allOnlineUser;
-        this.messageArea = messageArea;
-        this.editorArea = editorArea;
-        this.ipField = ipField;
-        this.portField = portField;
-    }
-
-    public Map<String, Socket> getAllOnlineUser() {
-        return allOnlineUser;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public JTextArea getMessageArea() {
-        return messageArea;
-    }
-
-    public JTextArea getEditorArea() {
-        return editorArea;
+    public ChatFrameListener(ChatUniversalData chatUniversalData) {
+        this.messageArea = chatUniversalData.getMessageArea();
+        this.editorArea = chatUniversalData.getEditorArea();
+        this.allOnlineUser = chatUniversalData.getAllOnlineUser();
+        this.chatUniversalData = chatUniversalData;
     }
 
     /**
@@ -98,6 +77,12 @@ public class ChatFrameListener implements ActionListener {
      * 发送文件
      */
     private void sendFile() throws IOException {
+        ObjectOutputStream oos = null;
+        try {
+            Socket socket = chatUniversalData.getSocket();
+            oos = new ObjectOutputStream(socket.getOutputStream());
+        } catch (Exception ignored) {}
+
         JFileChooser fileChooser = new JFileChooser();  //创建文件选择器
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);   //设置只能选择文件
         fileChooser.showDialog(new JLabel(), "选择");  //打开文件选择器
@@ -108,6 +93,7 @@ public class ChatFrameListener implements ActionListener {
             JOptionPane.showMessageDialog(null, "文件大小不能超过100M", "错误", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        assert oos != null;
         oos.writeObject("file://" + file);
         oos.flush();
         messageArea.append(oos.toString());
@@ -142,26 +128,39 @@ public class ChatFrameListener implements ActionListener {
                     throw new RuntimeException(ex);
                 }
             }
-            case "connect" -> connect();
+            case "connect" -> {
+                String userName = chatUniversalData.getUserName();
+                if(Objects.equals(userName, "Server")){
+                    connect();
+                }else{
+                    connect2server();
+                }
+
+            }
             case "disconnect" -> disconnect();
             default -> throw new IllegalStateException("Unexpected value: " + result);
         }
     }
 
     /**
-     * 连接
+     * 服务器连接到网络
      */
-    private void connect() {
-        String ip = ipField.getText();
-        String port = portField.getText();
-        try {
-            Socket socket = new Socket(ip, Integer.parseInt(port));
-            allOnlineUser.put(userName, socket);
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-            oos.writeObject("connect://" + userName);
-            oos.flush();
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "连接失败", "错误", JOptionPane.ERROR_MESSAGE);
+    private  void connect(){
+        if (chatUniversalData.getConnected()) {
+            JOptionPane.showMessageDialog(null, "服务器已连接网络，无需重复连接", "错误", JOptionPane.ERROR_MESSAGE);
+        } else {
+            new ChatServerThread(chatUniversalData);
+        }
+    }
+
+    /**
+     * 客户端连接到服务器
+     */
+    private void connect2server() {
+        if (chatUniversalData.getConnected()) {
+            JOptionPane.showMessageDialog(null, "客户端已连接，请勿重复点击", "错误", JOptionPane.ERROR_MESSAGE);
+        } else {
+            new ChatClientThread(chatUniversalData);
         }
     }
 
@@ -170,6 +169,7 @@ public class ChatFrameListener implements ActionListener {
      */
     private void disconnect() {
         try {
+            String userName = chatUniversalData.getUserName();
             Socket socket = allOnlineUser.get(userName);
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
             oos.writeObject("disconnect://" + userName);
@@ -184,14 +184,22 @@ public class ChatFrameListener implements ActionListener {
      * 发送消息
      */
     private void send() {
+        ObjectOutputStream oos = null;
+        try {
+            Socket socket = chatUniversalData.getSocket();
+            oos = new ObjectOutputStream(socket.getOutputStream());
+        } catch (Exception ignored) {}
+
         Date date = new Date();
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
         String time = dateFormat.format(date);
         String message = editorArea.getText();   //获取输入框的内容
+        String toUserName = chatUniversalData.getToUserName();
+        editorArea.setText("");   //清空输入框
 
-        //如果未连接，提示先连接服务器
+        //如果未连接，提示先连接
         if (oos == null) {
-            JOptionPane.showMessageDialog(null, "请先连接服务器", "错误", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "请先连接", "错误", JOptionPane.ERROR_MESSAGE);
             return;
         }
         //如果未输入内容，提示先输入内容
@@ -199,16 +207,18 @@ public class ChatFrameListener implements ActionListener {
             JOptionPane.showMessageDialog(null, "消息不能为空", "错误", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        String userName = chatUniversalData.getUserName();
+        String text = userName + " " + time + "\n" + message;       //拼接消息
+        messageArea.append(text + "\n");    //将消息发送到显示框(本地)
 
         try {
-            editorArea.setText("");   //清空输入框
-            String text = userName + " " + time + "\n" + message;       //拼接消息
-            messageArea.append(text + "\n");    //将消息发送到显示框(本地)
-            oos.writeObject("text://" + message);   //将消息发送到服务器
-            oos.flush();    //刷新流
+            text = toUserName + "-to:" + "text://" + message;
+            oos.writeObject(text);  //将消息发送到服务器
+            oos.flush();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            JOptionPane.showMessageDialog(null, "发送消息失败,请检查网络连接", "错误", JOptionPane.ERROR_MESSAGE);
         }
+
 
     }
 }

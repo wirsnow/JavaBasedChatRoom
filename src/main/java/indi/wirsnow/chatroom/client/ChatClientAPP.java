@@ -2,45 +2,19 @@ package indi.wirsnow.chatroom.client;
 
 import indi.wirsnow.chatroom.swingui.ChatFrame;
 import indi.wirsnow.chatroom.swingui.listener.ChatFrameListener;
+import indi.wirsnow.chatroom.util.ChatUniversalData;
 
 import javax.swing.*;
-import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.*;
 
 /**
  * @author : wirsnow
  * @date : 2022/12/7 11:04
- * @description : 客户端程序启动类
+ * @description : 启动客户端
  */
 public class ChatClientAPP {
-    /*
-    1、启动ui界面
-    2、尝试连接服务端
-    3、正常连接后，启动接收线程
-    */
-
-    // 线程池
-    private static final ExecutorService threadPool = new ThreadPoolExecutor(
-            2,
-            5,
-            3,
-            TimeUnit.SECONDS,
-            new LinkedBlockingDeque<>(3),
-            Executors.defaultThreadFactory(),
-            new ThreadPoolExecutor.DiscardOldestPolicy());
-
-
     public static void main(String[] args) {
-        JTextArea messageArea = new JTextArea();
-        JTextArea editorArea = new JTextArea();
-        JTextField ipField = new JTextField("127.0.0.1");     // IP输入框
-        JTextField portField = new JTextField("56448");       // port输入框
-        Map<String, Socket> allOnlineUser = new HashMap<>();
-        ChatFrameListener listener = new ChatFrameListener(allOnlineUser, messageArea, editorArea, ipField, portField);
-        // 启动ui界面
-        SwingUtilities.invokeLater(() -> new ChatFrame("Client", messageArea, editorArea, listener, ipField, portField));
-
+        ChatUniversalData chatUniversalData = new ChatUniversalData();  // 创建数据传输类
+        ChatFrameListener listener = new ChatFrameListener(chatUniversalData);  // 创建监听器
+        SwingUtilities.invokeLater(() -> new ChatFrame("Client", listener, chatUniversalData)); // 启动ui界面
     }
 }

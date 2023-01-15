@@ -1,50 +1,20 @@
 package indi.wirsnow.chatroom.server;
 
+import indi.wirsnow.chatroom.swingui.ChatFrame;
+import indi.wirsnow.chatroom.swingui.listener.ChatFrameListener;
+import indi.wirsnow.chatroom.util.ChatUniversalData;
+
 import javax.swing.*;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.concurrent.*;
 
 /**
  * @author : wirsnow
  * @date : 2022/12/8 19:24
- * @description : 服务端程序启动类
+ * @description : 启动服务端
  */
 public class ChatServerAPP {
-    /*
-    当有客户端连接时，服务器端会自动创建一个线程，用于处理该客户端的信息，
-    服务器端可以同时处理多个客户端的信息，当客户端断开连接时，服务器端会自动关闭该客户端的线程。
-    */
-
-    private static final JTextArea messageArea = new JTextArea();
-    private static final JTextArea editorArea = new JTextArea();
-    private ObjectOutputStream oos;
-    private ObjectInputStream ois;
-    // 线程池
-    private static final ExecutorService threadPool = new ThreadPoolExecutor(
-            2,
-            50,
-            3,
-            TimeUnit.SECONDS,
-            new LinkedBlockingDeque<>(3),
-            Executors.defaultThreadFactory(),
-            (r, executor) -> System.out.println("线程池已满，拒绝连接"));
-
     public static void main(String[] args) {
-
-
-//        // 创建服务器端的Socket对象
-//        Map<String, Socket> map = new HashMap<>();
-//        try (ServerSocket serverSocket = new ServerSocket(56448)) {
-//            //存取用户信息（用户名和Socket）
-//            System.out.println("服务器已启动，等待客户端连接...");
-//
-//            while (true) {
-//                Socket socket = serverSocket.accept();
-//                threadPool.execute(new ChatServerThread(socket, map, messageArea));
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        ChatUniversalData chatUniversalData = new ChatUniversalData();  // 创建数据传输类
+        ChatFrameListener listener = new ChatFrameListener(chatUniversalData);  // 创建监听器
+        SwingUtilities.invokeLater(() -> new ChatFrame("Server", listener, chatUniversalData)); // 启动ui界面
     }
 }

@@ -1,16 +1,32 @@
-package indi.wirsnow.chatroom.swingui.util;
+package indi.wirsnow.chatroom.util;
 
 import indi.wirsnow.chatroom.swingui.listener.ChatFrameListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * @author : wirsnow
  * @date : 2023/1/7 19:59
  * @description : 创建界面时需要用到的函数
  */
-public class ChatFrameUtil {
+public class ChatUtil {
+
+    public static void flushUserList(ChatUniversalData chatUniversalData){
+        DefaultListModel<String> dlm = new DefaultListModel<>();    // 创建列表模型
+        if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
+            dlm.add(0, "日志");
+            dlm.add(1, "所有人");
+        }
+        dlm.addAll(chatUniversalData.getAllOnlineUser().keySet());  // 添加所有用户
+        chatUniversalData.getUserList().setModel(dlm);              // 设置列表模型
+    }
+    public static void appendAndFlush(JTextArea textArea, String message) {
+        textArea.append(message);
+        textArea.paintImmediately(textArea.getBounds());
+    }
+
     /**
      * 设置工具栏按钮图标
      *

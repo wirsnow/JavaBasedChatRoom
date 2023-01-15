@@ -1,18 +1,26 @@
 package indi.wirsnow.chatroom.swingui;
 
 import indi.wirsnow.chatroom.swingui.listener.ChatFocusListener;
-import indi.wirsnow.chatroom.swingui.listener.ChatFrameListener;
+import indi.wirsnow.chatroom.util.ChatUniversalData;
 
 import javax.swing.*;
 import java.awt.*;
 
 /**
  * @author : wirsnow
- * @date : 2022/12/9 2:55
+ * @date : 2023/1/9 12:55
  * @description: 实现登录框
  */
 public class ChatLoginFrame {
-    public void login(JFrame mFrame, ChatFrameListener listener) {
+
+    private final JFrame mFrame;
+    private final ChatUniversalData chatUniversalData;
+    public ChatLoginFrame(JFrame mFrame, ChatUniversalData chatUniversalData) {
+        this.mFrame = mFrame;
+        this.chatUniversalData = chatUniversalData;
+    }
+
+    public void login() {
         JFrame frame = new JFrame("登录");
         JLabel userNameTip = new JLabel("用户名:");
         JTextField userNameField = new JTextField();
@@ -50,11 +58,12 @@ public class ChatLoginFrame {
             userName = userNameField.getText();
             if (userName.equals("")) {
                 JOptionPane.showMessageDialog(frame, "用户名不能为空", "错误", JOptionPane.ERROR_MESSAGE);
-            } else if(userName.equals("Server")) {
-                JOptionPane.showMessageDialog(frame, "用户名不能为Server", "错误", JOptionPane.ERROR_MESSAGE);
+            } else if(userName.equals("Server") || userName.equals("日志") || userName.equals("所有人")){
+                JOptionPane.showMessageDialog(frame, "名称中含有非法字符", "错误", JOptionPane.ERROR_MESSAGE);
             } else {
-                listener.setUserName(userName);
+                chatUniversalData.setUserName(userName);
                 frame.dispose();
+                mFrame.setTitle(userName);
                 mFrame.setVisible(true);
             }
         });
@@ -65,7 +74,6 @@ public class ChatLoginFrame {
         frame.add(space);
         frame.add(loginButton);
         frame.add(cancelButton);
-
 
         // 显示窗口
         frame.setVisible(true);

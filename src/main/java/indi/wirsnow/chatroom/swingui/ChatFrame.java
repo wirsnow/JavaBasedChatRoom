@@ -2,6 +2,7 @@ package indi.wirsnow.chatroom.swingui;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import indi.wirsnow.chatroom.swingui.listener.ChatFrameListener;
+import indi.wirsnow.chatroom.util.ChatUniversalData;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,12 +14,9 @@ import java.util.Objects;
  * @description : 通用ui界面
  */
 public class ChatFrame {
-    private final JTextArea messageArea;    // 聊天记录显示框
-    private final JTextArea editorArea;     // 文字输入框
-    private final JTextField ipField;
-    private final JTextField portField;
     private final ChatFrameListener listener; // 监听器
-    protected static final JFrame frame = new JFrame("聊天窗口");  // 创建总的窗口
+    private final ChatUniversalData chatUniversalData;    // 数据
+    protected static final JFrame frame = new JFrame("聊天窗口");  // 创建总窗口
 
     static {
         FlatIntelliJLaf.setup();
@@ -26,28 +24,29 @@ public class ChatFrame {
 
     /**
      * 构造方法
-     *
-     * @param messageArea 聊天记录显示框
-     * @param editorArea  文字输入框
+     * @param signal 服务端/客户按标志
+     *               Server: 服务端
+     *               Client: 客户端
+     * @param listener 监听器
+     * @param chatUniversalData 通用数据
      */
-    public ChatFrame(String signal,
-                     JTextArea messageArea,
-                     JTextArea editorArea,
-                     ChatFrameListener listener,
-                     JTextField ipField,
-                     JTextField portField) {
-        this.messageArea = messageArea;
-        this.editorArea = editorArea;
+    public ChatFrame(String signal,ChatFrameListener listener, ChatUniversalData chatUniversalData) {
         this.listener = listener;
-        this.ipField = ipField;
-        this.portField = portField;
-        createFrame();
+        this.chatUniversalData = chatUniversalData;
+        judgeCS(signal);
+    }
 
+    /**
+     * 判断是服务端还是客户端
+     */
+    private void judgeCS(String signal){
         if (Objects.equals(signal, "Client")) {
-            ChatLoginFrame chatLoginFrame = new ChatLoginFrame();
-            chatLoginFrame.login(frame, this.listener);
+            createFrame();
+            (new ChatLoginFrame(frame, chatUniversalData)).login();
         } else if (Objects.equals(signal, "Server")) {
-            this.listener.setUserName("Server");
+            chatUniversalData.setUserName("Server");
+            frame.setTitle("Server");
+            createFrame();
             frame.setVisible(true);
         }
     }
@@ -55,7 +54,8 @@ public class ChatFrame {
     /**
      * 初始化组件
      */
-    public void createFrame() {
+    private void createFrame() {
+
         // 窗体整体设置
         frame.setResizable(true);  // 设置窗口可改变大小
         frame.setSize(800, 600);    // 设置窗口大小
@@ -64,12 +64,11 @@ public class ChatFrame {
         frame.setLocationRelativeTo(null);  // 设置窗口居中
 
         // 左侧聊天面板
-        ChatLeftPanel chatLeftPanel = new ChatLeftPanel(frame, listener, messageArea, editorArea);
+        ChatLeftPanel chatLeftPanel = new ChatLeftPanel(frame, listener, chatUniversalData);
         chatLeftPanel.createLeftPanel();
 
         // 右侧功能面板
-        ChatRightPanel chatRightPanel = new ChatRightPanel(frame, listener, ipField, portField);
+        ChatRightPanel chatRightPanel = new ChatRightPanel(frame, listener, chatUniversalData);
         chatRightPanel.createRightPanel();
-
     }
 }

@@ -1,11 +1,12 @@
 package indi.wirsnow.chatroom.swingui;
 
 import indi.wirsnow.chatroom.swingui.listener.ChatFrameListener;
+import indi.wirsnow.chatroom.util.ChatUniversalData;
 
 import javax.swing.*;
 import java.awt.*;
 
-import static indi.wirsnow.chatroom.swingui.util.ChatFrameUtil.*;
+import static indi.wirsnow.chatroom.util.ChatUtil.*;
 
 /**
  * @author : wirsnow
@@ -14,9 +15,8 @@ import static indi.wirsnow.chatroom.swingui.util.ChatFrameUtil.*;
  */
 public class ChatLeftPanel {
     private final JFrame frame;             // 父窗口
-    private final JTextArea messageArea;    // 聊天显示框
-    private final JTextArea editorArea;     // 文字输入框
     private final ChatFrameListener listener; // 监听器
+    private final ChatUniversalData chatUniversalData;
 
     private static final JPanel messagePanel = new JPanel();            // 聊天面板
     private static final JToolBar toolBar = new JToolBar();             // 总工具栏
@@ -25,12 +25,10 @@ public class ChatLeftPanel {
     private static final JButton sendFileButton = new JButton();        // 文件按钮
     private static final JButton screenshotsButton = new JButton();     // 截图按钮
 
-    public ChatLeftPanel(JFrame frame, ChatFrameListener listener, JTextArea messageArea, JTextArea editorArea) {
+    public ChatLeftPanel(JFrame frame, ChatFrameListener listener, ChatUniversalData chatUniversalData) {
         this.frame = frame;
         this.listener = listener;
-        this.messageArea = messageArea;
-        this.editorArea = editorArea;
-
+        this.chatUniversalData = chatUniversalData;
     }
 
     public void createLeftPanel() {
@@ -42,6 +40,8 @@ public class ChatLeftPanel {
         messagePanel.requestFocus();    // 获取焦点
         gridBagLayout.rowHeights = new int[]{235, 40, 130, 30}; // 设置最小行高
 
+        JTextArea messageArea = chatUniversalData.getMessageArea();
+        JTextArea editorArea = chatUniversalData.getEditorArea();
         JScrollPane messageScrollPane = new JScrollPane(messageArea);   // 创建滚动条
         JScrollPane editorScrollPane = new JScrollPane(editorArea);     // 创建滚动条
 

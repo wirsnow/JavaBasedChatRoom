@@ -2,13 +2,13 @@ package indi.wirsnow.chatroom.swingui;
 
 import indi.wirsnow.chatroom.swingui.listener.ChatFocusListener;
 import indi.wirsnow.chatroom.swingui.listener.ChatFrameListener;
+import indi.wirsnow.chatroom.util.ChatUniversalData;
 
 import javax.swing.*;
 import java.awt.*;
-import java.net.Socket;
-import java.util.Map;
+import java.util.Objects;
 
-import static indi.wirsnow.chatroom.swingui.util.ChatFrameUtil.addGridBagComponent;
+import static indi.wirsnow.chatroom.util.ChatUtil.addGridBagComponent;
 
 /**
  * @author : wirsnow
@@ -18,20 +18,16 @@ import static indi.wirsnow.chatroom.swingui.util.ChatFrameUtil.addGridBagCompone
 public class ChatRightPanel {
     private final JFrame frame;                 // 父窗口
     private final ChatFrameListener listener;   // 监听器
-    private final JTextField ipField;           // IP输入框
-    private final JTextField portField;         // port输入框
+    private final ChatUniversalData chatUniversalData;
     private static final JPanel functionPanel = new JPanel();           // 功能面板
-    private final JButton connectButton = new JButton("连接");      // 连接按钮
-    private final JButton disconnectButton = new JButton("断开");   // 断开按钮
-    private final JTextField userField = new JTextField("当前在线: 0人"); // 在线人数
-    private final JList<String> userList = new JList<>();               // 用户列表
-    private final JScrollPane userListPane = new JScrollPane(userList); // 列表滚动条
+    private static final JButton connectButton = new JButton("连接");      // 连接按钮
+    private static final JButton disconnectButton = new JButton("断开");   // 断开按钮
 
-    public ChatRightPanel(JFrame frame, ChatFrameListener listener, JTextField ipField, JTextField portField) {
+
+    public ChatRightPanel(JFrame frame, ChatFrameListener listener, ChatUniversalData chatUniversalData) {
         this.frame = frame;
         this.listener = listener;
-        this.ipField = ipField;
-        this.portField = portField;
+        this.chatUniversalData = chatUniversalData;
     }
 
 
@@ -46,15 +42,24 @@ public class ChatRightPanel {
 
         // 添加ip与端口输入框
         {
+            JTextField ipField = chatUniversalData.getIpField();
+            JTextField portField = chatUniversalData.getPortField();
+
             ipField.setBackground(Color.WHITE);     // 设置IP框背景颜色
             ipField.setFont(new Font("微软雅黑", Font.PLAIN, 14)); // 设置字体
             ipField.addFocusListener(new ChatFocusListener(ipField, "请输入ip地址")); // 添加焦点监听器
-            addGridBagComponent(functionPanel, gridBagLayout, gridBagConstraints, ipField, 0, 0, 1, 1, 1, 0); // 添加组件
 
             portField.setBackground(Color.WHITE);   // 设置端口框背景颜色
             portField.setFont(new Font("微软雅黑", Font.PLAIN, 14)); // 设置字体
             portField.addFocusListener(new ChatFocusListener(portField, "请输入端口号")); // 添加焦点监听器
-            addGridBagComponent(functionPanel, gridBagLayout, gridBagConstraints, portField, 1, 0, 1, 1, 1, 0); // 添加组件
+
+            if (!Objects.equals(chatUniversalData.getUserName(), "Server")) {
+                addGridBagComponent(functionPanel, gridBagLayout, gridBagConstraints, ipField, 0, 0, 1, 1, 1, 0); // 添加组件
+                addGridBagComponent(functionPanel, gridBagLayout, gridBagConstraints, portField, 1, 0, 1, 1, 1, 0); // 添加组件
+            } else {
+                addGridBagComponent(functionPanel, gridBagLayout, gridBagConstraints, portField, 0, 0, 2, 1, 1, 0); // 添加组件
+            }
+
         }
 
         // 添加连接与断开按钮
@@ -69,6 +74,7 @@ public class ChatRightPanel {
 
         // 添加在线人数显示
         {
+            JTextField userField = chatUniversalData.getUserField(); // 在线人数
             userField.setEditable(false);   // 设置不可编辑
             userField.setBorder(null);      // 设置无边框
             userField.setFont(new Font("微软雅黑", Font.PLAIN, 14));    // 设置字体
@@ -77,13 +83,17 @@ public class ChatRightPanel {
 
         // 添加用户列表
         {
+            JList<String> userList = chatUniversalData.getUserList();        // 用户列表
+            JScrollPane userListPane = new JScrollPane(userList); // 列表滚动条
             userList.setBackground(Color.WHITE);    // 设置背景颜色
             userList.setFont(new Font("微软雅黑", Font.PLAIN, 14));    // 设置字体
             userList.setBorder(null);               // 设置无边框
             DefaultListModel<String> dlm = new DefaultListModel<>();            // 创建列表模型
-            dlm.add(0, "所有人");
-            Map<String, Socket> map = listener.getAllOnlineUser();
-            dlm.addAll(map.keySet());   // 添加所有用户
+            if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
+                dlm.add(0, "日志");
+                dlm.add(1, "所有人");
+            }
+            dlm.addAll(chatUniversalData.getAllOnlineUser().keySet());   // 添加所有用户
             userList.setModel(dlm);     // 设置列表数据
             userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);     // 设置单选模式
             userList.addListSelectionListener(e -> {
@@ -93,13 +103,7 @@ public class ChatRightPanel {
                     // 获取选项数据的 ListModel
                     ListModel<String> listModel = userList.getModel();
                     // 输出选中的选项
-                    System.out.println("选中: " + indices[0] + " = " + listModel.getElementAt(indices[0]));
-                    Socket socket = map.get(listModel.getElementAt(indices[0]));
-                    if (socket != null) {
-
-
-                    }
-
+                    chatUniversalData.setToUserName(listModel.getElementAt(indices[0]));
                 }
             });
             addGridBagComponent(functionPanel, gridBagLayout, gridBagConstraints, userListPane, 0, 3, 2, 1, 1, 1); // 添加组件
