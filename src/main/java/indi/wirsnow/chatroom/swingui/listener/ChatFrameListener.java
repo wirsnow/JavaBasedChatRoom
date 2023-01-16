@@ -129,15 +129,13 @@ public class ChatFrameListener implements ActionListener {
                 }
             }
             case "connect" -> {
-                String userName = chatUniversalData.getUserName();
-                if(Objects.equals(userName, "Server")){
+                if(Objects.equals(chatUniversalData.getUserName(), "Server")){
                     connect();
                 }else{
                     connect2server();
                 }
-
             }
-            case "disconnect" -> disconnect();
+            case "disconnect" -> chatUniversalData.setConnected(false);
             default -> throw new IllegalStateException("Unexpected value: " + result);
         }
     }

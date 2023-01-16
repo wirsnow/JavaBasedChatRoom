@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 
 import static indi.wirsnow.chatroom.util.ChatUtil.appendAndFlush;
 import static indi.wirsnow.chatroom.util.ChatUtil.flushUserList;
@@ -29,6 +30,7 @@ public class ChatClientMessageIO {
         this.oos = oos;
         this.ois = ois;
         this.chatUniversalData = chatUniversalData;
+
         ChatClientMessageInput();
     }
 
@@ -49,7 +51,7 @@ public class ChatClientMessageIO {
                 }
                 message = messageContent.toString();
                 String command = message.substring(0, 4);
-                message = message.substring(7); //  ://
+                message = message.substring(7); // 获取://之后的数据
                 switch (command) {
                     case "logi" -> {
                         if (Objects.equals(fromUserName, "Server")) {
@@ -65,6 +67,20 @@ public class ChatClientMessageIO {
                             flushUserList(chatUniversalData);
                         }
                     }
+                    case "list" -> {
+                        if (Objects.equals(fromUserName, "Server")) {
+                            Map<String, Socket> allOnlineUser = new TreeMap<>();
+                            // string转map
+                            String[] strings = message.split(",");
+                            for (String str : strings) {
+                                String[] s = str.split("=");
+                                allOnlineUser.put(s[0], null);
+                            }
+                            chatUniversalData.setAllOnlineUser(allOnlineUser);
+                            flushUserList(chatUniversalData);
+                        }
+
+                    }
                     case "text" -> {
                         Date date = new Date();
                         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
@@ -73,7 +89,8 @@ public class ChatClientMessageIO {
                     }
                 }
 
-            } catch (Exception ignored) {
+            } catch (
+                    Exception ignored) {
             }
         }
     }
