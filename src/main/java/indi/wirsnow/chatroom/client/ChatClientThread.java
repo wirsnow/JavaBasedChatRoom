@@ -17,7 +17,7 @@ public class ChatClientThread {
     private final ChatUniversalData chatUniversalData;
     private static final ExecutorService threadPool = new ThreadPoolExecutor(
             2,
-            3,
+            4,
             3,
             TimeUnit.SECONDS,
             new LinkedBlockingDeque<>(3),
@@ -35,20 +35,32 @@ public class ChatClientThread {
         int port = Integer.parseInt(chatUniversalData.getPortField().getText());
         String userName = chatUniversalData.getUserName();
         threadPool.execute(() -> {
-            try (Socket socket = new Socket(ip, port)) {
-                chatUniversalData.setSocket(socket);
+            try (Socket socket = new Socket(ip, port);
+                 ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                 ObjectInputStream ois = new ObjectInputStream(socket.getInputStream())) {
                 chatUniversalData.setConnected(true);
-                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                chatUniversalData.setSocket(socket);
                 oos.writeUTF(userName);
                 oos.flush();
-                ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                 // 多线程运行ChatClientMessageIO
-                threadPool.execute(() -> new ChatClientMessageIO(oos, ois, chatUniversalData));
+                threadPool.execute(() -> new ChatClientMessageIO(oos,ois, chatUniversalData));
+                System.out.println("第二个线程已经启动");
+                threadPool.execute(() -> {
+                    while (chatUniversalData.getConnected()) {
+                        try {
+                            Thread.sleep(10);
+                        } catch (Exception ignored) {}
+                    }
+                    threadPool.shutdownNow();
+                });
+                System.out.println("第三个线程已经启动");
             } catch (Exception e) {
                 chatUniversalData.setConnected(false);
                 JOptionPane.showMessageDialog(null, "连接失败\n" + e, "错误", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
             }
         });
+        System.out.println("第一个线程已经启动");
+
     }
 }

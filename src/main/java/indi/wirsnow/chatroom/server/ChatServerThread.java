@@ -41,37 +41,35 @@ public class ChatServerThread {
         threadPool.execute(() -> {
             // 创建服务器端ServerSocket，指定绑定的端口，并监听此端口
             try (ServerSocket serverSocket = new ServerSocket(port)) {
+                ObjectOutputStream oos;
+                ObjectInputStream ois;
                 System.out.println("服务器启动成功");
                 chatUniversalData.setConnected(true);
                 appendAndFlush(messageArea, "服务器启动成功，等待客户端连接...\n");
-
-                while (true) {
-                    // 调用accept()方法开始监听，等待客户端的连接
+                // 调用accept()方法开始监听，等待客户端的连接
+                while (chatUniversalData.getConnected()) {
                     try {
                         Thread.sleep(10);   //  休眠10ms，防止CPU占用过高
-                        System.out.println("客户端等待连接...");
                         Socket socket = serverSocket.accept();
-                        System.out.println("客户端连接成功");
-                        // 获取客户端发送的用户名
-                        String userName = new ObjectInputStream(socket.getInputStream()).readUTF();
-                        System.out.println("客户端用户名：" + userName);
+                        ois = new ObjectInputStream(socket.getInputStream());
+                        oos = new ObjectOutputStream(socket.getOutputStream());
+                        String userName = ois.readUTF();
+                        System.out.println("客户端" + userName + "连接成功");
                         // 刷新在线列表
                         allOnlineUser.put(userName, socket);
                         flushUserList(chatUniversalData);
-                        // 通知其他用户有新用户上线
-                        for (Map.Entry<String, Socket> entry : allOnlineUser.entrySet()) {
-                            if (entry.getValue() != null) {
-                                ObjectOutputStream oos = new ObjectOutputStream(entry.getValue().getOutputStream());
-                                oos.writeObject("Server-from:logi://" + userName);
-                                oos.flush();
-                                oos.close();
-                            }
+                        System.out.println(chatUniversalData.getAllOnlineUser());
+
+                        // 向所有人发送上线消息
+                        for(Map.Entry<String, Socket> entry : allOnlineUser.entrySet()) {
+                            ois = new ObjectInputStream(entry.getValue().getInputStream());
+                            oos = new ObjectOutputStream(entry.getValue().getOutputStream());
+                            oos.writeObject("Server-from:list://" + allOnlineUser);
+                            oos.flush();
                         }
+
                         chatUniversalData.setSocket(socket);
-                        allOnlineUser.put(userName, socket);
-
                         appendAndFlush(messageArea, "客户端" + socket.getInetAddress().getHostAddress() + "连接成功\n");
-
                         // 启动转发线程
                         threadPool.execute(new ServerForwardMessage(chatUniversalData));
                     } catch (Exception ignored) {}
