@@ -35,7 +35,7 @@ public class ServerForwardMessage implements Runnable {
             ObjectInputStream ois = new ObjectInputStream(mySocket.getInputStream());
             while (true) {
                 Thread.sleep(10);   //  休眠10ms，防止CPU占用过高
-                String message = ois.readObject().toString();
+                String message = ois.readUTF();
                 String[] messageArray = message.split("-to:");  // 消息格式：接收者-to:消息格式://消息内容
                 String targetUser = messageArray[0];    //  目标用户
                 StringBuilder messageContent = new StringBuilder();
@@ -69,7 +69,8 @@ public class ServerForwardMessage implements Runnable {
                 }
 
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

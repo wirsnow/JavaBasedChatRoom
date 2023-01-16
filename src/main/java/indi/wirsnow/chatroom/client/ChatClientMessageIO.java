@@ -76,6 +76,7 @@ public class ChatClientMessageIO {
                                 String[] s = str.split("=");
                                 allOnlineUser.put(s[0], null);
                             }
+                            JOptionPane.showMessageDialog(null, allOnlineUser.toString(), "错误", JOptionPane.ERROR_MESSAGE);
                             chatUniversalData.setAllOnlineUser(allOnlineUser);
                             flushUserList(chatUniversalData);
                         }
@@ -89,8 +90,8 @@ public class ChatClientMessageIO {
                     }
                 }
 
-            } catch (
-                    Exception ignored) {
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
     }

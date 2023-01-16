@@ -43,7 +43,7 @@ public class ChatClientThread {
                 oos.writeUTF(userName);
                 oos.flush();
                 // 多线程运行ChatClientMessageIO
-                threadPool.execute(() -> new ChatClientMessageIO(oos,ois, chatUniversalData));
+                threadPool.execute(() -> new ChatClientMessageIO(oos, ois, chatUniversalData));
 //                threadPool.execute(() -> {
 //                    while (chatUniversalData.getConnected()) {
 //                        try {
