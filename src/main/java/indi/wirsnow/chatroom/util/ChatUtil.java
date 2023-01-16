@@ -12,7 +12,11 @@ import java.util.Objects;
  * @description : 创建界面时需要用到的函数
  */
 public class ChatUtil {
-
+    /**
+     * 刷新在线用户列表
+     *
+     * @param chatUniversalData 数据传输类
+     */
     public static void flushUserList(ChatUniversalData chatUniversalData){
         DefaultListModel<String> dlm = new DefaultListModel<>();    // 创建列表模型
         if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
@@ -22,6 +26,13 @@ public class ChatUtil {
         dlm.addAll(chatUniversalData.getAllOnlineUser().keySet());  // 添加所有用户
         chatUniversalData.getUserList().setModel(dlm);              // 设置列表模型
     }
+
+    /**
+     * 立即刷新界面
+     *
+     * @param textArea  文本域
+     * @param message   消息
+     */
     public static void appendAndFlush(JTextArea textArea, String message) {
         textArea.append(message);
         textArea.paintImmediately(textArea.getBounds());
