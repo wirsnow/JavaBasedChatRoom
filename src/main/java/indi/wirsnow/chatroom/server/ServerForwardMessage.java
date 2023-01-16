@@ -36,7 +36,7 @@ public class ServerForwardMessage implements Runnable {
             while (true) {
                 Thread.sleep(10);   //  休眠10ms，防止CPU占用过高
                 String message = ois.readObject().toString();
-                String[] messageArray = message.split("-to:");
+                String[] messageArray = message.split("-to:");  // 消息格式：接收者-to:消息格式://消息内容
                 String targetUser = messageArray[0];    //  目标用户
                 StringBuilder messageContent = new StringBuilder();
                 for (int i = 1; i < messageArray.length; i++) {
@@ -44,7 +44,7 @@ public class ServerForwardMessage implements Runnable {
                 }
                 message = messageContent.toString();    //  消息内容
                 switch (message) {
-                    case "logout" -> {
+                    case "LogOut" -> {
                         // 如果是退出消息，就将用户从在线用户列表中移除
                         allOnlineUser.remove(targetUser);
                         flushUserList(chatUniversalData);
@@ -65,6 +65,7 @@ public class ServerForwardMessage implements Runnable {
                         oos.flush();
                         oos.close();
                     }
+
                 }
 
             }
