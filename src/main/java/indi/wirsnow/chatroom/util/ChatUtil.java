@@ -17,7 +17,7 @@ public class ChatUtil {
      *
      * @param chatUniversalData 数据传输类
      */
-    public static void flushUserList(ChatUniversalData chatUniversalData){
+    public static void flushUserList(ChatUniversalData chatUniversalData) {
         DefaultListModel<String> dlm = new DefaultListModel<>();    // 创建列表模型
         if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
             dlm.add(0, "日志");
@@ -30,8 +30,8 @@ public class ChatUtil {
     /**
      * 立即刷新界面
      *
-     * @param textArea  文本域
-     * @param message   消息
+     * @param textArea 文本域
+     * @param message  消息
      */
     public static void appendAndFlush(JTextArea textArea, String message) {
         textArea.append(message);

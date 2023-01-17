@@ -14,7 +14,6 @@ import java.util.concurrent.*;
  * @description : 客户端响应
  */
 public class ChatClientThread {
-    private final ChatUniversalData chatUniversalData;
     private static final ExecutorService threadPool = new ThreadPoolExecutor(
             2,
             4,
@@ -23,6 +22,7 @@ public class ChatClientThread {
             new LinkedBlockingDeque<>(3),
             Executors.defaultThreadFactory(),
             (r, executor) -> System.out.println("线程池已满，拒绝连接"));
+    private final ChatUniversalData chatUniversalData;
 
 
     public ChatClientThread(ChatUniversalData chatUniversalData) {

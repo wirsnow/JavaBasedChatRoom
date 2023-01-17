@@ -213,7 +213,7 @@ public class ChatFrameListener implements ActionListener {
                 JOptionPane.showMessageDialog(null, "发送消息失败,请检查网络连接", "错误", JOptionPane.ERROR_MESSAGE);
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "请先连接服务器\n"+ e, "错误", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "请先连接服务器\n" + e, "错误", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
 

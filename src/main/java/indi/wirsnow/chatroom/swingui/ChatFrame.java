@@ -14,23 +14,25 @@ import java.util.Objects;
  * @description : 通用ui界面
  */
 public class ChatFrame {
-    private final ChatFrameListener listener; // 监听器
-    private final ChatUniversalData chatUniversalData;    // 数据
     protected static final JFrame frame = new JFrame("聊天窗口");  // 创建总窗口
 
     static {
         FlatIntelliJLaf.setup();
     }
 
+    private final ChatFrameListener listener; // 监听器
+    private final ChatUniversalData chatUniversalData;    // 数据
+
     /**
      * 构造方法
-     * @param signal 服务端/客户按标志
-     *               Server: 服务端
-     *               Client: 客户端
-     * @param listener 监听器
+     *
+     * @param signal            服务端/客户按标志
+     *                          Server: 服务端
+     *                          Client: 客户端
+     * @param listener          监听器
      * @param chatUniversalData 通用数据
      */
-    public ChatFrame(String signal,ChatFrameListener listener, ChatUniversalData chatUniversalData) {
+    public ChatFrame(String signal, ChatFrameListener listener, ChatUniversalData chatUniversalData) {
         this.listener = listener;
         this.chatUniversalData = chatUniversalData;
         judgeCS(signal);
@@ -39,7 +41,7 @@ public class ChatFrame {
     /**
      * 判断是服务端还是客户端
      */
-    private void judgeCS(String signal){
+    private void judgeCS(String signal) {
         if (Objects.equals(signal, "Client")) {
             createFrame();
             (new ChatLoginFrame(frame, chatUniversalData)).login();

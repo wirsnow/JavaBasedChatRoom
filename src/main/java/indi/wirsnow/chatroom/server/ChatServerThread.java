@@ -19,7 +19,6 @@ import static indi.wirsnow.chatroom.util.ChatUtil.flushUserList;
  * @description : 服务端线程类
  */
 public class ChatServerThread {
-    private final ChatUniversalData chatUniversalData;
     private static final ExecutorService threadPool = new ThreadPoolExecutor(
             2,
             21,
@@ -28,6 +27,7 @@ public class ChatServerThread {
             new LinkedBlockingDeque<>(3),
             Executors.defaultThreadFactory(),
             (r, executor) -> System.out.println("线程池已满，拒绝连接"));
+    private final ChatUniversalData chatUniversalData;
 
     public ChatServerThread(ChatUniversalData chatUniversalData) {
         this.chatUniversalData = chatUniversalData;
@@ -62,7 +62,7 @@ public class ChatServerThread {
                         System.out.println(chatUniversalData.getAllOnlineUser());
                         Thread.sleep(100);
                         // 向所有人发送上线消息
-                        for(Map.Entry<String, Socket> entry : allOnlineUser.entrySet()) {
+                        for (Map.Entry<String, Socket> entry : allOnlineUser.entrySet()) {
                             ois = new ObjectInputStream(entry.getValue().getInputStream());
                             oos = new ObjectOutputStream(entry.getValue().getOutputStream());
                             oos.writeUTF("Server-from:list://" + allOnlineUser);
@@ -73,7 +73,8 @@ public class ChatServerThread {
                         appendAndFlush(messageArea, "客户端" + socket.getInetAddress().getHostAddress() + "连接成功\n");
                         // 启动转发线程
                         threadPool.execute(new ServerForwardMessage(chatUniversalData));
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 }
             } catch (Exception e) {
                 chatUniversalData.setConnected(false);

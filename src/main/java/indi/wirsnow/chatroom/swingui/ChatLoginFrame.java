@@ -15,6 +15,7 @@ public class ChatLoginFrame {
 
     private final JFrame mFrame;
     private final ChatUniversalData chatUniversalData;
+
     public ChatLoginFrame(JFrame mFrame, ChatUniversalData chatUniversalData) {
         this.mFrame = mFrame;
         this.chatUniversalData = chatUniversalData;
@@ -58,7 +59,7 @@ public class ChatLoginFrame {
             userName = userNameField.getText();
             if (userName.equals("")) {
                 JOptionPane.showMessageDialog(frame, "用户名不能为空", "错误", JOptionPane.ERROR_MESSAGE);
-            } else if(userName.equals("Server") || userName.equals("日志") || userName.equals("所有人")){
+            } else if (userName.equals("Server") || userName.equals("日志") || userName.equals("所有人")) {
                 JOptionPane.showMessageDialog(frame, "名称中含有非法字符", "错误", JOptionPane.ERROR_MESSAGE);
             } else {
                 chatUniversalData.setUserName(userName);
