@@ -33,6 +33,7 @@ public class ServerForwardMessage implements Runnable {
         // 监听客户端消息，如果有发送至服务器的，就转发给指定用户
         try {
             ObjectInputStream ois = new ObjectInputStream(mySocket.getInputStream());
+            ObjectOutputStream oos = new ObjectOutputStream(mySocket.getOutputStream());
             while (true) {
                 Thread.sleep(10);   //  休眠10ms，防止CPU占用过高
                 String message = ois.readUTF();
@@ -51,19 +52,19 @@ public class ServerForwardMessage implements Runnable {
                         // 通知其他用户有用户下线
                         for (Map.Entry<String, Socket> entry : allOnlineUser.entrySet()) {
                             if (entry.getValue() != null) {
-                                ObjectOutputStream oos = new ObjectOutputStream(entry.getValue().getOutputStream());
-                                oos.writeObject("Server-from:exit://" + targetUser);
-                                oos.flush();
-                                oos.close();
+                                ObjectInputStream oisTemp = new ObjectInputStream(entry.getValue().getInputStream());
+                                ObjectOutputStream oosTemp = new ObjectOutputStream(entry.getValue().getOutputStream());
+                                oosTemp.writeObject("Server-from:exit://" + targetUser);
+                                oosTemp.flush();
                             }
                         }
                     }
                     default -> {
                         Socket targetSocket = allOnlineUser.get(targetUser);
-                        ObjectOutputStream oos = new ObjectOutputStream(targetSocket.getOutputStream());
-                        oos.writeObject(userName + "-from:" + message);
-                        oos.flush();
-                        oos.close();
+                        ObjectInputStream oisTemp = new ObjectInputStream(targetSocket.getInputStream());
+                        ObjectOutputStream oosTemp = new ObjectOutputStream(targetSocket.getOutputStream());
+                        oosTemp.writeObject(userName + "-from:" + message);
+                        oosTemp.flush();
                     }
 
                 }
