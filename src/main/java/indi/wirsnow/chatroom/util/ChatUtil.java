@@ -20,8 +20,9 @@ public class ChatUtil {
     public static void flushUserList(ChatUniversalData chatUniversalData) {
         DefaultListModel<String> dlm = new DefaultListModel<>();    // 创建列表模型
         if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
-            dlm.add(0, "日志");
-            dlm.add(1, "所有人");
+            dlm.add(0, "所有人");
+        }else{
+            dlm.add(0, "Server");
         }
         dlm.addAll(chatUniversalData.getAllOnlineUser().keySet());  // 添加所有用户
         chatUniversalData.getUserList().setModel(dlm);              // 设置列表模型

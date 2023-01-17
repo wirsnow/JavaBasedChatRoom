@@ -90,8 +90,7 @@ public class ChatRightPanel {
             userList.setBorder(null);               // 设置无边框
             DefaultListModel<String> dlm = new DefaultListModel<>();            // 创建列表模型
             if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
-                dlm.add(0, "日志");
-                dlm.add(1, "所有人");
+                dlm.add(0, "所有人");
             }
             dlm.addAll(chatUniversalData.getAllOnlineUser().keySet());   // 添加所有用户
             userList.setModel(dlm);     // 设置列表数据

@@ -177,7 +177,6 @@ public class ChatFrameListener implements ActionListener {
      * 发送消息
      */
     private void send() {
-        try (ObjectOutputStream oos = chatUniversalData.getOos()) {
             Date date = new Date();
             DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
             String time = dateFormat.format(date);
@@ -207,15 +206,13 @@ public class ChatFrameListener implements ActionListener {
 
             try {
                 text = toUserName + "-to:" + "text://" + message;
-                oos.writeUTF(text);  //将消息发送到服务器
-                oos.flush();
+                chatUniversalData.oos.writeUTF(text);  //将消息发送到服务器
+                chatUniversalData.oos.flush();
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, "发送消息失败,请检查网络连接", "错误", JOptionPane.ERROR_MESSAGE);
+                throw new RuntimeException(e);
+
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "请先连接服务器\n" + e, "错误", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         }
 
-    }
+
 }

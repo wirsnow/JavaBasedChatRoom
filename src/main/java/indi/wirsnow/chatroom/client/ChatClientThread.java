@@ -8,6 +8,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.*;
 
+import static indi.wirsnow.chatroom.util.ChatUtil.flushUserList;
+
 /**
  * @author : wirsnow
  * @date : 2023/1/8 23:41
@@ -37,14 +39,13 @@ public class ChatClientThread {
 
         threadPool.execute(() -> {
             try (Socket socket = new Socket(ip, port)) {
-                chatUniversalData.setOos(new ObjectOutputStream(socket.getOutputStream()));
-                chatUniversalData.setOis(new ObjectInputStream(socket.getInputStream()));
+                chatUniversalData.oos = new ObjectOutputStream(socket.getOutputStream());
+                chatUniversalData.ois = new ObjectInputStream(socket.getInputStream());
                 chatUniversalData.setConnected(true);
                 chatUniversalData.setSocket(socket);
-                ObjectOutputStream oos = chatUniversalData.getOos();
-                oos.writeUTF(userName);
-                //刷新但不关闭oos
-                oos.flush();
+                chatUniversalData.oos.writeUTF(userName);
+                chatUniversalData.oos.flush();
+                flushUserList(chatUniversalData);
                 // 多线程运行ChatClientMessageIO
                 threadPool.execute(() -> new ChatClientMessageIO(chatUniversalData));
             } catch (Exception e) {

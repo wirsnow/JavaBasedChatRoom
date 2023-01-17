@@ -23,8 +23,8 @@ public class ChatUniversalData {
     private String userName = null;     // 用户名
     private String toUserName = null;   // 要发送的用户名
     private boolean Connected = false;  // 是否已连接
-    private ObjectOutputStream oos = null;     // 输出流
-    private ObjectInputStream ois = null;      // 输入流
+    public ObjectOutputStream oos = null;     // 输出流
+    public ObjectInputStream ois = null;      // 输入流
     private Map<String, Socket> allOnlineUser = new TreeMap<>();
 
     public Socket getSocket() {

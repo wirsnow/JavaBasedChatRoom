@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.*;
 
 import static indi.wirsnow.chatroom.util.ChatUtil.appendAndFlush;
@@ -41,8 +42,6 @@ public class ChatServerThread {
         threadPool.execute(() -> {
             // 创建服务器端ServerSocket，指定绑定的端口，并监听此端口
             try (ServerSocket serverSocket = new ServerSocket(port)) {
-                ObjectInputStream ois;
-                ObjectOutputStream oos;
 
                 System.out.println("服务器启动成功");
                 chatUniversalData.setConnected(true);
@@ -52,28 +51,36 @@ public class ChatServerThread {
                     try {
                         Thread.sleep(10);   //  休眠10ms，防止CPU占用过高
                         Socket socket = serverSocket.accept();
-                        ois = new ObjectInputStream(socket.getInputStream());
-                        oos = new ObjectOutputStream(socket.getOutputStream());
-                        String userName = ois.readUTF();
+                        chatUniversalData.ois = new ObjectInputStream(socket.getInputStream());
+                        chatUniversalData.oos = new ObjectOutputStream(socket.getOutputStream());
+                        String userName = chatUniversalData.ois.readUTF();
                         System.out.println("客户端" + userName + "连接成功");
                         // 刷新在线列表
                         allOnlineUser.put(userName, socket);
                         flushUserList(chatUniversalData);
                         System.out.println(chatUniversalData.getAllOnlineUser());
                         Thread.sleep(100);
-                        // 向所有人发送上线消息
+                        // 把allOnlineUser发送给所有客户端
+                        chatUniversalData.oos.writeUTF("Server-from:list://" + allOnlineUser);
+                        // 为每个客户端创建一个线程
                         for (Map.Entry<String, Socket> entry : allOnlineUser.entrySet()) {
-                            ois = new ObjectInputStream(entry.getValue().getInputStream());
-                            oos = new ObjectOutputStream(entry.getValue().getOutputStream());
-                            oos.writeUTF("Server-from:list://" + allOnlineUser);
-                            oos.flush();
+                            if (entry.getValue().isConnected() && !Objects.equals(entry.getKey(), userName)) {
+                                ObjectInputStream oisTemp = new ObjectInputStream(entry.getValue().getInputStream());
+                                ObjectOutputStream oosTemp = new ObjectOutputStream(entry.getValue().getOutputStream());
+                                oosTemp.writeUTF("Server-from:list://" + allOnlineUser);
+                                oosTemp.flush();
+                                oisTemp.close();
+                                oosTemp.close();
+                                System.out.println("已发送给" + entry.getKey());
+                            }
                         }
-
+                        // 向所有人发送上线消息
                         chatUniversalData.setSocket(socket);
                         appendAndFlush(messageArea, "客户端" + socket.getInetAddress().getHostAddress() + "连接成功\n");
                         // 启动转发线程
                         threadPool.execute(new ServerForwardMessage(chatUniversalData));
-                    } catch (Exception ignored) {
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             } catch (Exception e) {

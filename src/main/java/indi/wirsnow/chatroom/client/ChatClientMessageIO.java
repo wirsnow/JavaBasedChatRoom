@@ -24,7 +24,6 @@ public class ChatClientMessageIO {
     private final ChatUniversalData chatUniversalData;
 
     public ChatClientMessageIO(ChatUniversalData chatUniversalData) {
-
         this.chatUniversalData = chatUniversalData;
 
         ChatClientMessageInput();
@@ -34,12 +33,10 @@ public class ChatClientMessageIO {
      * 监听客户端消息输入
      */
     public void ChatClientMessageInput() {
-        ObjectInputStream ois = chatUniversalData.getOis();
         while (true) {
             try {
                 Thread.sleep(10);   //  休眠10ms，防止CPU占用过高
-                String message = ois.readUTF();
-
+                String message = chatUniversalData.ois.readUTF();
                 System.out.println("收到消息：" + message);
 
                 JTextArea messageArea = chatUniversalData.getMessageArea();
@@ -89,7 +86,7 @@ public class ChatClientMessageIO {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+               // e.printStackTrace();
                 continue;
             }
         }
