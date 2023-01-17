@@ -22,13 +22,10 @@ import static indi.wirsnow.chatroom.util.ChatUtil.flushUserList;
  * @description : 监听客户端消息输入输出
  */
 public class ChatClientMessageIO {
-    private final ObjectOutputStream oos;
-    private final ObjectInputStream ois;
     private final ChatUniversalData chatUniversalData;
 
-    public ChatClientMessageIO(ObjectOutputStream oos, ObjectInputStream ois, ChatUniversalData chatUniversalData) {
-        this.oos = oos;
-        this.ois = ois;
+    public ChatClientMessageIO(ChatUniversalData chatUniversalData) {
+
         this.chatUniversalData = chatUniversalData;
 
         ChatClientMessageInput();
@@ -38,10 +35,14 @@ public class ChatClientMessageIO {
      * 监听客户端消息输入
      */
     public void ChatClientMessageInput() {
+        ObjectInputStream ois = chatUniversalData.getOis();
         while (true) {
             try {
                 Thread.sleep(10);   //  休眠10ms，防止CPU占用过高
-                String message = ois.readObject().toString();
+                String message = ois.readUTF();
+
+                System.out.println("收到消息：" + message);
+
                 JTextArea messageArea = chatUniversalData.getMessageArea();
                 String[] messageArray = message.split("-from:");
                 String fromUserName = messageArray[0];
@@ -80,7 +81,6 @@ public class ChatClientMessageIO {
                             chatUniversalData.setAllOnlineUser(allOnlineUser);
                             flushUserList(chatUniversalData);
                         }
-
                     }
                     case "text" -> {
                         Date date = new Date();
@@ -89,9 +89,9 @@ public class ChatClientMessageIO {
                         appendAndFlush(messageArea, fromUserName + " " + time + "\n" + message);
                     }
                 }
-
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                continue;
             }
         }
     }

@@ -1,6 +1,8 @@
 package indi.wirsnow.chatroom.util;
 
 import javax.swing.*;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,10 +13,12 @@ import java.util.TreeMap;
  * @description : 储存服务端不同的类之间需要交换的数据
  */
 public class ChatUniversalData {
-    private Socket socket;      // 服务端与客户端的socket
+    private Socket socket = null;      // 服务端与客户端的socket
     private String userName = null;     // 用户名
     private String toUserName = null;   // 要发送的用户名
     private boolean Connected = false;  // 是否已连接
+    private ObjectOutputStream oos = null;     // 输出流
+    private ObjectInputStream ois = null;      // 输入流
     private final JList<String> userList = new JList<>();       // 用户列表
     private final JTextArea messageArea = new JTextArea();      // 消息区域
     private final JTextArea editorArea = new JTextArea();       // 编辑区域
@@ -53,6 +57,22 @@ public class ChatUniversalData {
 
     public void setConnected(boolean connected) {
         this.Connected = connected;
+    }
+
+    public ObjectOutputStream getOos() {
+        return oos;
+    }
+
+    public void setOos(ObjectOutputStream oos) {
+        this.oos = oos;
+    }
+
+    public ObjectInputStream getOis() {
+        return ois;
+    }
+
+    public void setOis(ObjectInputStream ois) {
+        this.ois = ois;
     }
 
     public JList<String> getUserList() {

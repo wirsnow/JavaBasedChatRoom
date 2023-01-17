@@ -77,11 +77,7 @@ public class ChatFrameListener implements ActionListener {
      * 发送文件
      */
     private void sendFile() throws IOException {
-        ObjectOutputStream oos = null;
-        try {
-            Socket socket = chatUniversalData.getSocket();
-            oos = new ObjectOutputStream(socket.getOutputStream());
-        } catch (Exception ignored) {}
+        ObjectOutputStream oos = chatUniversalData.getOos();
 
         JFileChooser fileChooser = new JFileChooser();  //创建文件选择器
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);   //设置只能选择文件
@@ -94,7 +90,7 @@ public class ChatFrameListener implements ActionListener {
             return;
         }
         assert oos != null;
-        oos.writeObject("file://" + file);
+        oos.writeUTF("file://" + file);
         oos.flush();
         messageArea.append(oos.toString());
     }
@@ -129,9 +125,9 @@ public class ChatFrameListener implements ActionListener {
                 }
             }
             case "connect" -> {
-                if(Objects.equals(chatUniversalData.getUserName(), "Server")){
+                if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
                     connect();
-                }else{
+                } else {
                     connect2server();
                 }
             }
@@ -143,7 +139,7 @@ public class ChatFrameListener implements ActionListener {
     /**
      * 服务器连接到网络
      */
-    private  void connect(){
+    private void connect() {
         if (chatUniversalData.getConnected()) {
             JOptionPane.showMessageDialog(null, "服务器已连接网络，无需重复连接", "错误", JOptionPane.ERROR_MESSAGE);
         } else {
@@ -172,7 +168,6 @@ public class ChatFrameListener implements ActionListener {
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
             oos.writeObject("disconnect://" + userName);
             oos.flush();
-            socket.close();
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "断开连接失败", "错误", JOptionPane.ERROR_MESSAGE);
         }
@@ -182,41 +177,45 @@ public class ChatFrameListener implements ActionListener {
      * 发送消息
      */
     private void send() {
-        ObjectOutputStream oos = null;
-        try {
-            Socket socket = chatUniversalData.getSocket();
-            oos = new ObjectOutputStream(socket.getOutputStream());
-        } catch (Exception ignored) {}
+        try (ObjectOutputStream oos = chatUniversalData.getOos()) {
+            Date date = new Date();
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
+            String time = dateFormat.format(date);
+            String message = editorArea.getText();   //获取输入框的内容
+            String toUserName = chatUniversalData.getToUserName();
+            editorArea.setText("");   //清空输入框
 
-        Date date = new Date();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
-        String time = dateFormat.format(date);
-        String message = editorArea.getText();   //获取输入框的内容
-        String toUserName = chatUniversalData.getToUserName();
-        editorArea.setText("");   //清空输入框
+            //如果未输入内容，提示先输入内容
+            if ("".equals(message)) {   //如果输入框为空，不发送消息
+                JOptionPane.showMessageDialog(null, "消息不能为空", "错误", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            //如果未选择用户，提示先选择用户
+            if (Objects.equals(chatUniversalData.getToUserName(), null)) {
+                JOptionPane.showMessageDialog(null, "请选择聊天对象", "错误", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            //如果选择的用户是自己，提示不能选择自己
+            if (Objects.equals(chatUniversalData.getToUserName(), chatUniversalData.getUserName())) {
+                JOptionPane.showMessageDialog(null, "不能选择自己", "错误", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-        //如果未连接，提示先连接
-        if (oos == null) {
-            JOptionPane.showMessageDialog(null, "请先连接", "错误", JOptionPane.ERROR_MESSAGE);
-            return;
+            String userName = chatUniversalData.getUserName();
+            String text = userName + " " + time + "\n" + message;       //拼接消息
+            messageArea.append(text + "\n");    //将消息发送到显示框(本地)
+
+            try {
+                text = toUserName + "-to:" + "text://" + message;
+                oos.writeUTF(text);  //将消息发送到服务器
+                oos.flush();
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "发送消息失败,请检查网络连接", "错误", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "请先连接服务器\n"+ e, "错误", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
-        //如果未输入内容，提示先输入内容
-        if ("".equals(message)) {   //如果输入框为空，不发送消息
-            JOptionPane.showMessageDialog(null, "消息不能为空", "错误", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        String userName = chatUniversalData.getUserName();
-        String text = userName + " " + time + "\n" + message;       //拼接消息
-        messageArea.append(text + "\n");    //将消息发送到显示框(本地)
-
-        try {
-            text = toUserName + "-to:" + "text://" + message;
-            oos.writeObject(text);  //将消息发送到服务器
-            oos.flush();
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "发送消息失败,请检查网络连接", "错误", JOptionPane.ERROR_MESSAGE);
-        }
-
 
     }
 }

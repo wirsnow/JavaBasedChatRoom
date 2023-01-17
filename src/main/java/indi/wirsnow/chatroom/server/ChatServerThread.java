@@ -41,8 +41,9 @@ public class ChatServerThread {
         threadPool.execute(() -> {
             // 创建服务器端ServerSocket，指定绑定的端口，并监听此端口
             try (ServerSocket serverSocket = new ServerSocket(port)) {
-                ObjectOutputStream oos;
                 ObjectInputStream ois;
+                ObjectOutputStream oos;
+
                 System.out.println("服务器启动成功");
                 chatUniversalData.setConnected(true);
                 appendAndFlush(messageArea, "服务器启动成功，等待客户端连接...\n");
@@ -59,12 +60,12 @@ public class ChatServerThread {
                         allOnlineUser.put(userName, socket);
                         flushUserList(chatUniversalData);
                         System.out.println(chatUniversalData.getAllOnlineUser());
-
+                        Thread.sleep(100);
                         // 向所有人发送上线消息
                         for(Map.Entry<String, Socket> entry : allOnlineUser.entrySet()) {
                             ois = new ObjectInputStream(entry.getValue().getInputStream());
                             oos = new ObjectOutputStream(entry.getValue().getOutputStream());
-                            oos.writeObject("Server-from:list://" + allOnlineUser);
+                            oos.writeUTF("Server-from:list://" + allOnlineUser);
                             oos.flush();
                         }
 

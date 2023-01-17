@@ -34,24 +34,19 @@ public class ChatClientThread {
         String ip = chatUniversalData.getIpField().getText();
         int port = Integer.parseInt(chatUniversalData.getPortField().getText());
         String userName = chatUniversalData.getUserName();
+
         threadPool.execute(() -> {
-            try (Socket socket = new Socket(ip, port);
-                 ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                 ObjectInputStream ois = new ObjectInputStream(socket.getInputStream())) {
+            try (Socket socket = new Socket(ip, port)) {
+                chatUniversalData.setOos(new ObjectOutputStream(socket.getOutputStream()));
+                chatUniversalData.setOis(new ObjectInputStream(socket.getInputStream()));
                 chatUniversalData.setConnected(true);
                 chatUniversalData.setSocket(socket);
+                ObjectOutputStream oos = chatUniversalData.getOos();
                 oos.writeUTF(userName);
+                //刷新但不关闭oos
                 oos.flush();
                 // 多线程运行ChatClientMessageIO
-                threadPool.execute(() -> new ChatClientMessageIO(oos, ois, chatUniversalData));
-//                threadPool.execute(() -> {
-//                    while (chatUniversalData.getConnected()) {
-//                        try {
-//                            Thread.sleep(10);
-//                        } catch (Exception ignored) {}
-//                    }
-//                    threadPool.shutdownNow();
-//                });
+                threadPool.execute(() -> new ChatClientMessageIO(chatUniversalData));
             } catch (Exception e) {
                 chatUniversalData.setConnected(false);
                 JOptionPane.showMessageDialog(null, "连接失败\n" + e, "错误", JOptionPane.ERROR_MESSAGE);
