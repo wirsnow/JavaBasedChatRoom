@@ -3,7 +3,9 @@ package indi.wirsnow.chatroom.client;
 import indi.wirsnow.chatroom.util.ChatUniversalData;
 
 import javax.swing.*;
-import java.io.ObjectInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -21,24 +23,31 @@ import static indi.wirsnow.chatroom.util.ChatUtil.flushUserList;
  * @description : 监听客户端消息输入输出
  */
 public class ChatClientMessageIO {
+    private final Socket socket;
     private final ChatUniversalData chatUniversalData;
 
-    public ChatClientMessageIO(ChatUniversalData chatUniversalData) {
+    public ChatClientMessageIO(Socket socket, ChatUniversalData chatUniversalData) {
+        this.socket = socket;
         this.chatUniversalData = chatUniversalData;
-
+        System.out.println(socket.isClosed());
         ChatClientMessageInput();
     }
 
     /**
      * 监听客户端消息输入
      */
-    public void ChatClientMessageInput() {
-        while (true) {
-            try {
-                Thread.sleep(10);   //  休眠10ms，防止CPU占用过高
-                String message = chatUniversalData.ois.readUTF();
-                System.out.println("收到消息：" + message);
 
+    public void ChatClientMessageInput() {
+        BufferedReader reader = null;
+        try {
+            System.out.println(socket.isClosed());
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            System.out.println(socket.isClosed());
+            while (true) {
+                System.out.println(socket.isClosed());
+                String message = reader.readLine();
+                System.out.println(socket.isClosed());
+                System.out.println("收到消息：" + message);
                 JTextArea messageArea = chatUniversalData.getMessageArea();
                 String[] messageArray = message.split("-from:");
                 String fromUserName = messageArray[0];
@@ -49,7 +58,16 @@ public class ChatClientMessageIO {
                 message = messageContent.toString();
                 String command = message.substring(0, 4);
                 message = message.substring(7); // 获取://之后的数据
+
+                System.out.println("command:" + command);
+                System.out.println("message:" + message);
                 switch (command) {
+                    case "getu" -> {
+                        OutputStreamWriter writer = new OutputStreamWriter(chatUniversalData.getSocket().getOutputStream());
+                        writer.write("Server-MyUserName-to:" + chatUniversalData.getUserName());
+                        writer.write("\n");
+                        writer.flush();
+                    }
                     case "logi" -> {
                         if (Objects.equals(fromUserName, "Server")) {
                             Map<String, Socket> map = chatUniversalData.getAllOnlineUser();
@@ -85,11 +103,9 @@ public class ChatClientMessageIO {
                         appendAndFlush(messageArea, fromUserName + " " + time + "\n" + message);
                     }
                 }
-            } catch (Exception e) {
-               // e.printStackTrace();
-                continue;
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-
 }

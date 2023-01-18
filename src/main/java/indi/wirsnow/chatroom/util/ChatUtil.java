@@ -21,7 +21,7 @@ public class ChatUtil {
         DefaultListModel<String> dlm = new DefaultListModel<>();    // 创建列表模型
         if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
             dlm.add(0, "所有人");
-        }else{
+        } else {
             dlm.add(0, "Server");
         }
         dlm.addAll(chatUniversalData.getAllOnlineUser().keySet());  // 添加所有用户

@@ -1,7 +1,7 @@
 package indi.wirsnow.chatroom.swingui.listener;
 
 import indi.wirsnow.chatroom.client.ChatClientThread;
-import indi.wirsnow.chatroom.server.ChatServerThread;
+import indi.wirsnow.chatroom.server.ServerThreadStart;
 import indi.wirsnow.chatroom.util.ChatUniversalData;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,6 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -77,7 +78,6 @@ public class ChatFrameListener implements ActionListener {
      * 发送文件
      */
     private void sendFile() throws IOException {
-        ObjectOutputStream oos = chatUniversalData.getOos();
 
         JFileChooser fileChooser = new JFileChooser();  //创建文件选择器
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);   //设置只能选择文件
@@ -89,10 +89,8 @@ public class ChatFrameListener implements ActionListener {
             JOptionPane.showMessageDialog(null, "文件大小不能超过100M", "错误", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        assert oos != null;
-        oos.writeUTF("file://" + file);
-        oos.flush();
-        messageArea.append(oos.toString());
+        chatUniversalData.out.println("file://" + file);
+        messageArea.append(chatUniversalData.out.toString());
     }
 
     /**
@@ -143,7 +141,7 @@ public class ChatFrameListener implements ActionListener {
         if (chatUniversalData.getConnected()) {
             JOptionPane.showMessageDialog(null, "服务器已连接网络，无需重复连接", "错误", JOptionPane.ERROR_MESSAGE);
         } else {
-            new ChatServerThread(chatUniversalData);
+            new ServerThreadStart(chatUniversalData);
         }
     }
 
@@ -177,42 +175,49 @@ public class ChatFrameListener implements ActionListener {
      * 发送消息
      */
     private void send() {
-            Date date = new Date();
-            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
-            String time = dateFormat.format(date);
-            String message = editorArea.getText();   //获取输入框的内容
-            String toUserName = chatUniversalData.getToUserName();
-            editorArea.setText("");   //清空输入框
+        Date date = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
+        String time = dateFormat.format(date);
+        String message = editorArea.getText();   //获取输入框的内容
+        String toUserName = chatUniversalData.getToUserName();
 
-            //如果未输入内容，提示先输入内容
-            if ("".equals(message)) {   //如果输入框为空，不发送消息
-                JOptionPane.showMessageDialog(null, "消息不能为空", "错误", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            //如果未选择用户，提示先选择用户
-            if (Objects.equals(chatUniversalData.getToUserName(), null)) {
-                JOptionPane.showMessageDialog(null, "请选择聊天对象", "错误", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            //如果选择的用户是自己，提示不能选择自己
-            if (Objects.equals(chatUniversalData.getToUserName(), chatUniversalData.getUserName())) {
-                JOptionPane.showMessageDialog(null, "不能选择自己", "错误", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            String userName = chatUniversalData.getUserName();
-            String text = userName + " " + time + "\n" + message;       //拼接消息
-            messageArea.append(text + "\n");    //将消息发送到显示框(本地)
-
-            try {
-                text = toUserName + "-to:" + "text://" + message;
-                chatUniversalData.oos.writeUTF(text);  //将消息发送到服务器
-                chatUniversalData.oos.flush();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-
-            }
+        //如果未输入内容，提示先输入内容
+        if ("".equals(message)) {   //如果输入框为空，不发送消息
+            JOptionPane.showMessageDialog(null, "消息不能为空", "错误", JOptionPane.ERROR_MESSAGE);
+            return;
         }
+        //如果未选择用户，提示先选择用户
+        if (Objects.equals(chatUniversalData.getToUserName(), null)) {
+            JOptionPane.showMessageDialog(null, "请选择聊天对象", "错误", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        //如果选择的用户是自己，提示不能选择自己
+        if (Objects.equals(chatUniversalData.getToUserName(), chatUniversalData.getUserName())) {
+            JOptionPane.showMessageDialog(null, "不能选择自己", "错误", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        editorArea.setText("");   //清空输入框
+
+        String userName = chatUniversalData.getUserName();
+        String text = userName + " " + time + "\n" + message;   //拼接消息
+        messageArea.append(text + "\n");    //将消息发送到显示框(本地)
+
+        text = toUserName + "-to:" + "text://" + message;       //拼接消息
+
+        try {
+            OutputStreamWriter writer = new OutputStreamWriter(chatUniversalData.getSocket().getOutputStream());
+
+            writer.write(text);
+
+            writer.write("\n");
+
+            writer.flush();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
 
 }
