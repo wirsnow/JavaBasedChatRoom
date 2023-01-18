@@ -3,6 +3,8 @@ package indi.wirsnow.chatroom.client;
 import indi.wirsnow.chatroom.util.ChatUniversalData;
 
 import javax.swing.*;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.*;
 
@@ -38,6 +40,9 @@ public class ChatClientThread {
             try (Socket socket = new Socket(ip, port)) {
                 chatUniversalData.setConnected(true);
                 flushUserList(chatUniversalData);
+                chatUniversalData.setSocket(socket);
+                PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+                writer.println("Server-MyUserName-to:" + chatUniversalData.getUserName());
                 // 多线程运行ChatClientMessageIO
                 new ChatClientMessageIO(socket, chatUniversalData);
             } catch (Exception e) {

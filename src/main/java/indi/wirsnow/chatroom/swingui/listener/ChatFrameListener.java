@@ -12,10 +12,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -202,17 +199,25 @@ public class ChatFrameListener implements ActionListener {
         String text = userName + " " + time + "\n" + message;   //拼接消息
         messageArea.append(text + "\n");    //将消息发送到显示框(本地)
 
-        text = toUserName + "-to:" + "text://" + message;       //拼接消息
 
         try {
-            OutputStreamWriter writer = new OutputStreamWriter(chatUniversalData.getSocket().getOutputStream());
-
-            writer.write(text);
-
-            writer.write("\n");
-
-            writer.flush();
-
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(chatUniversalData.getSocket().getOutputStream()), true);
+            message = message.replace("\n", "\\n").replace("\r", "\\r");
+            text = toUserName + "-to:" + "text://" + message;       //拼接消息
+            System.out.println(text);
+            writer.println(text);
+//            String[] strs = message.split("\n");
+//            if (strs.length == 1) {
+//                text = toUserName + "-to:" + "text://" + message;       //拼接消息
+//                System.out.println(text);
+//                writer.println(text);
+//            } else {
+//                for (String string : strs) {
+//                    text = toUserName + "-to:" + "texs://" + string;       //拼接消息
+//                    System.out.println(text);
+//                    writer.println(text);
+//                }
+//            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

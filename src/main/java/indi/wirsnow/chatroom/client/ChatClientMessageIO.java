@@ -5,7 +5,6 @@ import indi.wirsnow.chatroom.util.ChatUniversalData;
 import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -29,7 +28,7 @@ public class ChatClientMessageIO {
     public ChatClientMessageIO(Socket socket, ChatUniversalData chatUniversalData) {
         this.socket = socket;
         this.chatUniversalData = chatUniversalData;
-        System.out.println(socket.isClosed());
+
         ChatClientMessageInput();
     }
 
@@ -38,7 +37,7 @@ public class ChatClientMessageIO {
      */
 
     public void ChatClientMessageInput() {
-        BufferedReader reader = null;
+        BufferedReader reader;
         try {
             System.out.println(socket.isClosed());
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -62,12 +61,6 @@ public class ChatClientMessageIO {
                 System.out.println("command:" + command);
                 System.out.println("message:" + message);
                 switch (command) {
-                    case "getu" -> {
-                        OutputStreamWriter writer = new OutputStreamWriter(chatUniversalData.getSocket().getOutputStream());
-                        writer.write("Server-MyUserName-to:" + chatUniversalData.getUserName());
-                        writer.write("\n");
-                        writer.flush();
-                    }
                     case "logi" -> {
                         if (Objects.equals(fromUserName, "Server")) {
                             Map<String, Socket> map = chatUniversalData.getAllOnlineUser();
@@ -97,6 +90,12 @@ public class ChatClientMessageIO {
                         }
                     }
                     case "text" -> {
+                        Date date = new Date();
+                        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
+                        String time = dateFormat.format(date);
+                        appendAndFlush(messageArea, fromUserName + " " + time + "\n" + message);
+                    }
+                    case "texs" -> {
                         Date date = new Date();
                         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
                         String time = dateFormat.format(date);
