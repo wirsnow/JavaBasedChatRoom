@@ -2,24 +2,39 @@ package indi.wirsnow.chatroom.server;
 
 import indi.wirsnow.chatroom.util.ChatUniversalData;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
-
-import static indi.wirsnow.chatroom.util.ChatUtil.flushUserList;
+import java.util.Objects;
 
 /**
  * @author : wirsnow
  * @date : 2023/1/14 18:08
  * @description : 服务端用来转发客户端消息的类
  */
-public class ServerForwardMessage implements Runnable {
+public class ServerMessageInput implements Runnable {
+    private BufferedReader in;
+    private PrintWriter out;
+    private Socket socket;
+    private final Map<String,Socket> allOnlineUser;
     private final ChatUniversalData chatUniversalData;
 
-    public ServerForwardMessage(ChatUniversalData chatUniversalData) {
+    public ServerMessageInput(ServerSocket serverSocket, ChatUniversalData chatUniversalData) {
+        this.allOnlineUser = chatUniversalData.getAllOnlineUser();
         this.chatUniversalData = chatUniversalData;
 
+        try {
+            Socket socket = serverSocket.accept();
+            chatUniversalData.setSocket(socket);
+            System.out.println("客户端连接成功");
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter((new OutputStreamWriter(socket.getOutputStream())), true);
+            out.println("Server-from:gteu://00");
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -27,22 +42,19 @@ public class ServerForwardMessage implements Runnable {
      */
     @Override
     public void run() {
-        String userName = chatUniversalData.getUserName();
-        Map<String, Socket> allOnlineUser = chatUniversalData.getAllOnlineUser();
+        String message;
         // 监听客户端消息，如果有发送至服务器的，就转发给指定用户
-        while (true) {
-            try {
-                Thread.sleep(10);   //  休眠10ms，防止CPU占用过高
-                String message = chatUniversalData.ois.readUTF();
-                System.out.println("收到" + userName + "的消息：" + message);
-                break;
-//                String[] messageArray = message.split("-to:");  // 消息格式：接收者-to:消息格式://消息内容
-//                String targetUser = messageArray[0];    //  目标用户
-//                StringBuilder messageContent = new StringBuilder();
-//                for (int i = 1; i < messageArray.length; i++) {
-//                    messageContent.append(messageArray[i]);
-//                }
-//                message = messageContent.toString();    //  消息内容
+        try {
+            while ((message = in.readLine())!=null) {
+                String[] messageArray = message.split("-to:");  // 消息格式：接收者-to:消息格式://消息内容
+                String targetUser = messageArray[0];    //  目标用户
+                StringBuilder messageContent = new StringBuilder();
+                for (int i = 1; i < messageArray.length; i++) {
+                    messageContent.append(messageArray[i]);
+                }
+                message = messageContent.toString();    //  消息内容
+                if(Objects.equals(targetUser, "Server-MyUserName")) allOnlineUser.put(message, socket);
+                System.out.println("收到消息：" + message);
 //                switch (message) {
 //                    case "GetUserList" -> {
 //                        // 将在线用户列表发送给客户端
@@ -71,9 +83,10 @@ public class ServerForwardMessage implements Runnable {
 //                        oosTemp.flush();
 //                    }
 //                }
-            } catch (Exception e) {
-               // e.printStackTrace();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+
 }
