@@ -12,7 +12,8 @@ import java.io.InputStreamReader;
  * @description : 服务端一对一聊天类
  */
 public class ServerMessageOutput implements Runnable {
-    private ChatUniversalData chatUniversalData;
+    private final ChatUniversalData chatUniversalData;
+
     public ServerMessageOutput(ChatUniversalData chatUniversalData) {
         this.chatUniversalData = chatUniversalData;
     }

@@ -14,11 +14,11 @@ import java.util.Objects;
  * @description : 服务端用来转发客户端消息的类
  */
 public class ServerMessageInput implements Runnable {
+    private final Map<String, Socket> allOnlineUser;
+    private final ChatUniversalData chatUniversalData;
     private BufferedReader in;
     private PrintWriter out;
     private Socket socket;
-    private final Map<String,Socket> allOnlineUser;
-    private final ChatUniversalData chatUniversalData;
 
     public ServerMessageInput(ServerSocket serverSocket, ChatUniversalData chatUniversalData) {
         this.allOnlineUser = chatUniversalData.getAllOnlineUser();
@@ -32,7 +32,7 @@ public class ServerMessageInput implements Runnable {
             out = new PrintWriter((new OutputStreamWriter(socket.getOutputStream())), true);
             out.println("Server-from:gteu://00");
 
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -45,7 +45,7 @@ public class ServerMessageInput implements Runnable {
         String message;
         // 监听客户端消息，如果有发送至服务器的，就转发给指定用户
         try {
-            while ((message = in.readLine())!=null) {
+            while ((message = in.readLine()) != null) {
                 String[] messageArray = message.split("-to:");  // 消息格式：接收者-to:消息格式://消息内容
                 String targetUser = messageArray[0];    //  目标用户
                 StringBuilder messageContent = new StringBuilder();
@@ -53,7 +53,7 @@ public class ServerMessageInput implements Runnable {
                     messageContent.append(messageArray[i]);
                 }
                 message = messageContent.toString();    //  消息内容
-                if(Objects.equals(targetUser, "Server-MyUserName")) allOnlineUser.put(message, socket);
+                if (Objects.equals(targetUser, "Server-MyUserName")) allOnlineUser.put(message, socket);
                 System.out.println("收到消息：" + message);
 //                switch (message) {
 //                    case "GetUserList" -> {

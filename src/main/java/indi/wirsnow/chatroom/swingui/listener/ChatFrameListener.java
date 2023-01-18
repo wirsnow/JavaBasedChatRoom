@@ -213,7 +213,7 @@ public class ChatFrameListener implements ActionListener {
 
             writer.flush();
 
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 

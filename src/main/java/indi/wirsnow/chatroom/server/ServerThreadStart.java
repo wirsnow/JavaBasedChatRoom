@@ -4,7 +4,6 @@ import indi.wirsnow.chatroom.util.ChatUniversalData;
 
 import javax.swing.*;
 import java.net.ServerSocket;
-
 import java.util.concurrent.*;
 
 import static indi.wirsnow.chatroom.util.ChatUtil.appendAndFlush;

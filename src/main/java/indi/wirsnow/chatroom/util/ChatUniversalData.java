@@ -1,7 +1,8 @@
 package indi.wirsnow.chatroom.util;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Map;
 import java.util.TreeMap;
@@ -18,12 +19,12 @@ public class ChatUniversalData {
     private final JTextField ipField = new JTextField("127.0.0.1");     // IP输入框
     private final JTextField portField = new JTextField("56448");       // port输入框
     private final JTextField userField = new JTextField("当前在线: 0人"); // 在线人数
+    public BufferedReader in = null;    // 输入流
+    public PrintWriter out = null;      // 输出流
     private Socket socket = null;       // 服务端与客户端的socket
     private String userName = null;     // 用户名
     private String toUserName = null;   // 要发送的用户名
     private boolean Connected = false;  // 是否已连接
-    public BufferedReader in = null;    // 输入流
-    public PrintWriter out = null;      // 输出流
     private Map<String, Socket> allOnlineUser = new TreeMap<>();
 
     public Socket getSocket() {
