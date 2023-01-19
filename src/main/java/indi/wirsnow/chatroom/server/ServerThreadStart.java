@@ -47,7 +47,6 @@ public class ServerThreadStart {
                         // 调用accept()方法开始监听，等待客户端的连接
                         Socket socket = serverSocket.accept();
                         chatUniversalData.setSocket(socket);
-                        System.out.println("客户端连接成功");
                         threadPool.execute(new ServerMessageInput(socket, chatUniversalData));
                     } catch (IOException e) {
                         e.printStackTrace();
