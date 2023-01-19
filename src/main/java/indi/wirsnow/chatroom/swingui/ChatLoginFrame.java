@@ -9,7 +9,7 @@ import java.awt.*;
 /**
  * @author : wirsnow
  * @date : 2023/1/9 12:55
- * @description: 实现登录框
+ * @description: 客户端登录框
  */
 public class ChatLoginFrame {
 

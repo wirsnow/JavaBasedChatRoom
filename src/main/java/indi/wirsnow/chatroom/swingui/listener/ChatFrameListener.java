@@ -1,6 +1,6 @@
 package indi.wirsnow.chatroom.swingui.listener;
 
-import indi.wirsnow.chatroom.client.ChatClientThread;
+import indi.wirsnow.chatroom.client.ClientThreadStart;
 import indi.wirsnow.chatroom.server.ServerThreadStart;
 import indi.wirsnow.chatroom.util.ChatUniversalData;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +24,7 @@ import java.util.Objects;
 /**
  * @author : wirsnow
  * @date : 2022/12/10 14:53
- * @description : ChatFrame的监听器
+ * @description : 接收动作事件的侦听器
  */
 public class ChatFrameListener implements ActionListener {
     private final JTextArea messageArea;
@@ -150,7 +150,7 @@ public class ChatFrameListener implements ActionListener {
         if (chatUniversalData.getConnected()) {
             JOptionPane.showMessageDialog(null, "客户端已连接，请勿重复点击", "错误", JOptionPane.ERROR_MESSAGE);
         } else {
-            new ChatClientThread(chatUniversalData);
+            new ClientThreadStart(chatUniversalData);
         }
     }
 
@@ -201,7 +201,6 @@ public class ChatFrameListener implements ActionListener {
         String text = userName + " " + time + "\n" + message;   //拼接消息
         messageArea.append(text + "\n");    //将消息发送到显示框(本地)
 
-
         try {
             PrintWriter writer = new PrintWriter(new OutputStreamWriter(chatUniversalData.getSocket().getOutputStream()), true);
             String[] strs = message.split("\n");
@@ -225,8 +224,5 @@ public class ChatFrameListener implements ActionListener {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
-
-
 }

@@ -8,18 +8,18 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 import static indi.wirsnow.chatroom.util.ChatMessageParse.parseMessage;
-import static indi.wirsnow.chatroom.util.ChatUtil.appendAndFlush;
+import static indi.wirsnow.chatroom.util.ChatUniversalUtil.appendAndFlush;
 
 /**
  * @author : wirsnow
  * @date : 2023/1/15 14:34
- * @description : 监听客户端消息输入输出
+ * @description : 客户端接收消息类
  */
-public class ChatClientMessageIO {
+public class ClientMessageInput {
     private final Socket socket;
     private final ChatUniversalData chatUniversalData;
 
-    public ChatClientMessageIO(Socket socket, ChatUniversalData chatUniversalData) {
+    public ClientMessageInput(Socket socket, ChatUniversalData chatUniversalData) {
         this.socket = socket;
         this.chatUniversalData = chatUniversalData;
 

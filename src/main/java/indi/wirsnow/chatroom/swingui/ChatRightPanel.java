@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
 
-import static indi.wirsnow.chatroom.util.ChatUtil.addGridBagComponent;
+import static indi.wirsnow.chatroom.util.ChatUniversalUtil.addGridBagComponent;
 
 /**
  * @author : wirsnow

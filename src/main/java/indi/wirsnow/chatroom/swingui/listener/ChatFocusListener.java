@@ -8,7 +8,7 @@ import java.awt.event.FocusListener;
 /**
  * @author : wirsnow
  * @date : 2023/1/2 0:15
- * @description : 焦点监听
+ * @description : 接收键盘焦点的侦听器
  */
 public class ChatFocusListener implements FocusListener {
     private final String string;

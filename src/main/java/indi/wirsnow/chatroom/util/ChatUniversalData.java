@@ -10,7 +10,7 @@ import java.util.TreeMap;
 /**
  * @author : wirsnow
  * @date : 2023/1/14 20:35
- * @description : 储存服务端不同的类之间需要交换的数据
+ * @description : 储存客户端与服务端不同的类之间需要交换的数据
  */
 public class ChatUniversalData {
     private final JList<String> userList = new JList<>();       // 用户列表

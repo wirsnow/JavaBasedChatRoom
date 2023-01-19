@@ -6,7 +6,7 @@ import indi.wirsnow.chatroom.util.ChatUniversalData;
 import javax.swing.*;
 import java.awt.*;
 
-import static indi.wirsnow.chatroom.util.ChatUtil.*;
+import static indi.wirsnow.chatroom.util.ChatUniversalUtil.*;
 
 /**
  * @author : wirsnow

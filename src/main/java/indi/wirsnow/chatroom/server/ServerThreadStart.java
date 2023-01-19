@@ -8,16 +8,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.*;
 
-import static indi.wirsnow.chatroom.util.ChatUtil.appendAndFlush;
+import static indi.wirsnow.chatroom.util.ChatUniversalUtil.appendAndFlush;
 
 
 /**
  * @author : wirsnow
  * @date : 2023/1/1 14:03
- * @description : 服务端线程类
+ * @description : 服务端多线程启动器
  */
 public class ServerThreadStart {
-    private static final ExecutorService threadPool = new ThreadPoolExecutor(
+    private final ExecutorService threadPool = new ThreadPoolExecutor(
             5,
             21,
             3,
@@ -41,7 +41,6 @@ public class ServerThreadStart {
                 System.out.println("服务器启动成功");
                 chatUniversalData.setConnected(true);
                 appendAndFlush(messageArea, "服务器启动成功，等待客户端连接...\n");
-
                 while (true) {
                     try {
                         // 调用accept()方法开始监听，等待客户端的连接
@@ -51,7 +50,6 @@ public class ServerThreadStart {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
                 }
             } catch (Exception e) {
                 chatUniversalData.setConnected(false);

@@ -9,9 +9,9 @@ import java.util.Objects;
 /**
  * @author : wirsnow
  * @date : 2023/1/7 19:59
- * @description : 创建界面时需要用到的函数
+ * @description : 服务端与客户端共用的工具类
  */
-public class ChatUtil {
+public class ChatUniversalUtil {
     /**
      * 刷新在线用户列表
      *

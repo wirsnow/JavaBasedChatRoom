@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.Objects;
 
 import static indi.wirsnow.chatroom.util.ChatMessageParse.parseMessage;
-import static indi.wirsnow.chatroom.util.ChatUtil.appendAndFlush;
-import static indi.wirsnow.chatroom.util.ChatUtil.flushUserList;
+import static indi.wirsnow.chatroom.util.ChatUniversalUtil.appendAndFlush;
+import static indi.wirsnow.chatroom.util.ChatUniversalUtil.flushUserList;
 
 /**
  * @author : wirsnow
  * @date : 2023/1/14 18:08
- * @description : 服务端用来转发客户端消息的类
+ * @description : 服务端接收消息类
  */
 public class ServerMessageInput implements Runnable {
     private final Map<String, Socket> allOnlineUser;

@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 
-import static indi.wirsnow.chatroom.util.ChatUtil.flushUserList;
+import static indi.wirsnow.chatroom.util.ChatUniversalUtil.flushUserList;
 
 /**
  * @author : wirsnow
