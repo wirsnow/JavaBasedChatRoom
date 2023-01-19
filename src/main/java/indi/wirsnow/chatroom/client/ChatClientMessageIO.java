@@ -93,12 +93,7 @@ public class ChatClientMessageIO {
                         Date date = new Date();
                         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
                         String time = dateFormat.format(date);
-                        appendAndFlush(messageArea, fromUserName + " " + time + "\n" + message);
-                    }
-                    case "texs" -> {
-                        Date date = new Date();
-                        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
-                        String time = dateFormat.format(date);
+                        message = message.replace("\\/n", "\n").replace("\\/r", "\r");
                         appendAndFlush(messageArea, fromUserName + " " + time + "\n" + message);
                     }
                 }

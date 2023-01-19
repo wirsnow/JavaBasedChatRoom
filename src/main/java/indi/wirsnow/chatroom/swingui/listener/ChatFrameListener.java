@@ -202,7 +202,7 @@ public class ChatFrameListener implements ActionListener {
 
         try {
             PrintWriter writer = new PrintWriter(new OutputStreamWriter(chatUniversalData.getSocket().getOutputStream()), true);
-            message = message.replace("\n", "\\n").replace("\r", "\\r");
+            message = message.replace("\n", "\\/n").replace("\r", "\\/r");
             text = toUserName + "-to:" + "text://" + message;       //拼接消息
             System.out.println(text);
             writer.println(text);

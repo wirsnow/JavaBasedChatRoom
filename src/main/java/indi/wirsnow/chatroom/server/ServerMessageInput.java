@@ -2,8 +2,10 @@ package indi.wirsnow.chatroom.server;
 
 import indi.wirsnow.chatroom.util.ChatUniversalData;
 
-import java.io.*;
-import java.net.ServerSocket;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Map;
 import java.util.Objects;
@@ -18,15 +20,14 @@ import static indi.wirsnow.chatroom.util.ChatUtil.flushUserList;
 public class ServerMessageInput implements Runnable {
     private final Map<String, Socket> allOnlineUser;
     private final ChatUniversalData chatUniversalData;
-    private final ServerSocket serverSocket;
-    private BufferedReader in;
-    private PrintWriter out;
-    private Socket socket;
 
-    public ServerMessageInput(ServerSocket serverSocket, ChatUniversalData chatUniversalData) {
-        this.serverSocket = serverSocket;
+    private final Socket socket;
+
+    public ServerMessageInput(Socket socket, ChatUniversalData chatUniversalData) {
+        this.socket = socket;
         this.allOnlineUser = chatUniversalData.getAllOnlineUser();
         this.chatUniversalData = chatUniversalData;
+
     }
 
     /**
@@ -37,17 +38,10 @@ public class ServerMessageInput implements Runnable {
         String userName = null;
         String message;
         // 监听客户端消息，如果有发送至服务器的，就转发给指定用户
-        try {
-            socket = serverSocket.accept();
-            chatUniversalData.setSocket(socket);
-            System.out.println("客户端连接成功");
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter((new OutputStreamWriter(socket.getOutputStream())), true);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         try {
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter((new OutputStreamWriter(socket.getOutputStream())), true);
             while ((message = in.readLine()) != null && !Objects.equals(message.trim(), "")) {
                 String[] messageArray = message.split("-to:");  // 消息格式：接收者-to:消息格式://消息内容
                 String targetUser = messageArray[0];    //  目标用户
@@ -64,10 +58,8 @@ public class ServerMessageInput implements Runnable {
                     continue;
                 }
                 switch (message) {
-                    case "GetUserList" -> {
-                        // 将在线用户列表发送给客户端
-                        out.println("Server-from:list://" + allOnlineUser.toString());
-                    }
+                    case "GetUserList" -> // 将在线用户列表发送给客户端
+                            out.println("Server-from:list://" + allOnlineUser.toString());
                     case "LogOut" -> {
                         // 如果是退出消息，就将用户从在线用户列表中移除
                         allOnlineUser.remove(targetUser);
@@ -83,6 +75,7 @@ public class ServerMessageInput implements Runnable {
                     }
                     default -> {
                         if (Objects.equals(targetUser, "Server")) {
+                            message = message.replace("\\/n", "\n").replace("\\/r", "\r");
                             chatUniversalData.getMessageArea().append(message);
                         } else {
                             Socket targetSocket = allOnlineUser.get(targetUser);

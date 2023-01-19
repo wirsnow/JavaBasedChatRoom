@@ -36,7 +36,7 @@ public class ChatClientThread {
         String ip = chatUniversalData.getIpField().getText();
         int port = Integer.parseInt(chatUniversalData.getPortField().getText());
 
-        new Thread(() -> {
+        threadPool.execute(() -> {
             try (Socket socket = new Socket(ip, port)) {
                 chatUniversalData.setConnected(true);
                 flushUserList(chatUniversalData);
@@ -50,7 +50,7 @@ public class ChatClientThread {
                 JOptionPane.showMessageDialog(null, "连接失败\n" + e, "错误", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
             }
-        }).start();
+        });
 
     }
 }

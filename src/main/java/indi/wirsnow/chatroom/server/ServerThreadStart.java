@@ -3,7 +3,9 @@ package indi.wirsnow.chatroom.server;
 import indi.wirsnow.chatroom.util.ChatUniversalData;
 
 import javax.swing.*;
+import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.*;
 
 import static indi.wirsnow.chatroom.util.ChatUtil.appendAndFlush;
@@ -33,22 +35,30 @@ public class ServerThreadStart {
     public void connect() {
         JTextArea messageArea = chatUniversalData.getMessageArea();
         int port = Integer.parseInt(chatUniversalData.getPortField().getText());
-        new Thread(() -> {
+        threadPool.execute(() -> {
             // 创建服务器端ServerSocket，指定绑定的端口，并监听此端口
             try (ServerSocket serverSocket = new ServerSocket(port)) {
                 System.out.println("服务器启动成功");
                 chatUniversalData.setConnected(true);
                 appendAndFlush(messageArea, "服务器启动成功，等待客户端连接...\n");
 
-                // 调用accept()方法开始监听，等待客户端的连接
                 while (true) {
-                    new Thread(new ServerMessageInput(serverSocket, chatUniversalData)).start();
+                    try {
+                        // 调用accept()方法开始监听，等待客户端的连接
+                        Socket socket = serverSocket.accept();
+                        chatUniversalData.setSocket(socket);
+                        System.out.println("客户端连接成功");
+                        threadPool.execute(new ServerMessageInput(socket, chatUniversalData));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                 }
             } catch (Exception e) {
                 chatUniversalData.setConnected(false);
                 JOptionPane.showMessageDialog(null, "端口号已被占用", "错误", JOptionPane.ERROR_MESSAGE);
             }
-        }).start();
+        });
     }
 }
 
