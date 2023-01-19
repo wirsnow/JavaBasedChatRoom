@@ -2,14 +2,13 @@ package indi.wirsnow.chatroom.server;
 
 import indi.wirsnow.chatroom.util.ChatUniversalData;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Map;
 import java.util.Objects;
 
+import static indi.wirsnow.chatroom.util.ChatMessageParse.parseMessage;
+import static indi.wirsnow.chatroom.util.ChatUtil.appendAndFlush;
 import static indi.wirsnow.chatroom.util.ChatUtil.flushUserList;
 
 /**
@@ -38,26 +37,34 @@ public class ServerMessageInput implements Runnable {
         String userName = null;
         String message;
         // 监听客户端消息，如果有发送至服务器的，就转发给指定用户
-
+        BufferedReader in;
+        PrintWriter out;
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter((new OutputStreamWriter(socket.getOutputStream())), true);
-            while ((message = in.readLine()) != null && !Objects.equals(message.trim(), "")) {
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter((new OutputStreamWriter(socket.getOutputStream())), true);
+            while (true) {
+                message = in.readLine();
+                if (message == null || Objects.equals(message.strip(), "")) {
+                    continue;
+                }
                 String[] messageArray = message.split("-to:");  // 消息格式：接收者-to:消息格式://消息内容
                 String targetUser = messageArray[0];    //  目标用户
                 StringBuilder messageContent = new StringBuilder();
                 for (int i = 1; i < messageArray.length; i++) {
                     messageContent.append(messageArray[i]);
+                    if (i != messageArray.length - 1) {
+                        messageContent.append("-to:");
+                    }
                 }
-                message = messageContent.toString();    //  消息内容
+                String result = messageContent.toString();    //  消息内容
                 if (Objects.equals(targetUser, "Server-MyUserName")) {
-                    allOnlineUser.put(message, socket);
-                    System.out.println("用户" + message + "上线");
+                    allOnlineUser.put(result, socket);
+                    System.out.println("用户" + result + "上线");
                     flushUserList(chatUniversalData);
-                    userName = message;
+                    userName = result;
                     continue;
                 }
-                switch (message) {
+                switch (result) {
                     case "GetUserList" -> // 将在线用户列表发送给客户端
                             out.println("Server-from:list://" + allOnlineUser.toString());
                     case "LogOut" -> {
@@ -75,19 +82,20 @@ public class ServerMessageInput implements Runnable {
                     }
                     default -> {
                         if (Objects.equals(targetUser, "Server")) {
-                            message = message.replace("\\/n", "\n").replace("\\/r", "\r");
-                            chatUniversalData.getMessageArea().append(message);
+                            message = userName + "-from:" + result;
+                            System.out.println(message);
+                            result = parseMessage(chatUniversalData, message);
+                            appendAndFlush(chatUniversalData.getMessageArea(), result);
                         } else {
                             Socket targetSocket = allOnlineUser.get(targetUser);
                             PrintWriter outTemp = new PrintWriter((new OutputStreamWriter(targetSocket.getOutputStream())), true);
-                            outTemp.println(userName + "-from:" + message);
+                            outTemp.println(userName + "-from:" + result);
                         }
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
-
 }

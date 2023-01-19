@@ -16,6 +16,7 @@ import java.io.*;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -179,8 +180,9 @@ public class ChatFrameListener implements ActionListener {
         String toUserName = chatUniversalData.getToUserName();
 
         //如果未输入内容，提示先输入内容
-        if ("".equals(message)) {   //如果输入框为空，不发送消息
+        if ("".equals(message.strip())) {   //如果输入框为空，不发送消息
             JOptionPane.showMessageDialog(null, "消息不能为空", "错误", JOptionPane.ERROR_MESSAGE);
+            editorArea.setText("");   //清空输入框
             return;
         }
         //如果未选择用户，提示先选择用户
@@ -202,22 +204,24 @@ public class ChatFrameListener implements ActionListener {
 
         try {
             PrintWriter writer = new PrintWriter(new OutputStreamWriter(chatUniversalData.getSocket().getOutputStream()), true);
-            message = message.replace("\n", "\\/n").replace("\r", "\\/r");
-            text = toUserName + "-to:" + "text://" + message;       //拼接消息
-            System.out.println(text);
-            writer.println(text);
-//            String[] strs = message.split("\n");
-//            if (strs.length == 1) {
-//                text = toUserName + "-to:" + "text://" + message;       //拼接消息
-//                System.out.println(text);
-//                writer.println(text);
-//            } else {
-//                for (String string : strs) {
-//                    text = toUserName + "-to:" + "texs://" + string;       //拼接消息
-//                    System.out.println(text);
-//                    writer.println(text);
-//                }
-//            }
+            String[] strs = message.split("\n");
+            System.out.println("strs=" + Arrays.toString(strs) + ",strs.length=" + strs.length);
+            if (strs.length <= 1) {
+                text = toUserName + "-to:" + "text://" + message;       //拼接消息
+                System.out.println(text);
+                writer.println(text);
+            } else {
+                writer.println(toUserName + "-to:texs://start");
+                for (String string : strs) {
+                    switch (string) {
+                        case "start" -> string = "startstart";
+                        case "newline" -> string = "newlinenewline";
+                        case "\n", "\r", "" -> string = "newline";
+                    }
+                    writer.println(toUserName + "-to:texs://" + string + "\n");
+                    System.out.println("已发送" + string + " " + writer.checkError());
+                }
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
