@@ -170,20 +170,22 @@ public class ChatFrameListener implements ActionListener {
         String toUserName = chatUniversalData.getToUserName();
 
         if (Objects.equals(chatUniversalData.getToUserName(), null)) {
-            //如果未选择发送对象，提示
+            // 如果未选择发送对象
             JOptionPane.showMessageDialog(null, "请选择聊天对象", "提示", JOptionPane.INFORMATION_MESSAGE);
             return;
-        }else if ("".equals(message.strip())) {   //如果输入框为空，不发送消息
+        }else if (Objects.equals(chatUniversalData.getToUserName(), chatUniversalData.getUserName())) {
+            // 如果选择的用户是自己
+            JOptionPane.showMessageDialog(null, "不能选择自己", "提示", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }else if ("".equals(message.strip())) {
+            // 如果输入框为空
             JOptionPane.showMessageDialog(null, "消息不能为空", "提示", JOptionPane.INFORMATION_MESSAGE);
             editorArea.setText("");   //清空输入框
             return;
         }else if (message.length() > 1000) {
+            // 如果输入框内容超过1000个字符
             String tip = "消息长度不能超过1000\n请删除" + (message.length() - 1000) + "个字";
             JOptionPane.showMessageDialog(null, tip, "提示", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }else if (Objects.equals(chatUniversalData.getToUserName(), chatUniversalData.getUserName())) {
-            //如果选择的用户是自己，提示不能选择自己
-            JOptionPane.showMessageDialog(null, "不能选择自己", "提示", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         editorArea.setText("");   //清空输入框
