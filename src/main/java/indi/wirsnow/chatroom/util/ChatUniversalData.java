@@ -18,7 +18,7 @@ public class ChatUniversalData {
     private final JTextArea editorArea = new JTextArea();       // 编辑区域
     private final JTextField ipField = new JTextField("127.0.0.1");     // IP输入框
     private final JTextField portField = new JTextField("56448");       // port输入框
-    private final JTextField userField = new JTextField("当前在线: 0人"); // 在线人数
+    private final JTextField userField = new JTextField("当前在线: 0"); // 在线人数
     public BufferedReader in = null;    // 输入流
     public PrintWriter out = null;      // 输出流
     private Socket socket = null;       // 服务端与客户端的socket

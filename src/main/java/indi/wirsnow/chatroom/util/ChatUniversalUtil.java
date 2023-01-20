@@ -26,6 +26,7 @@ public class ChatUniversalUtil {
         }
         dlm.addAll(chatUniversalData.getAllOnlineUser().keySet());  // 添加所有用户
         chatUniversalData.getUserList().setModel(dlm);              // 设置列表模型
+        chatUniversalData.getUserField().setText("当前在线: " + chatUniversalData.getAllOnlineUser().size());
     }
 
     /**

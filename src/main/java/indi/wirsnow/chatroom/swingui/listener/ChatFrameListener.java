@@ -169,20 +169,21 @@ public class ChatFrameListener implements ActionListener {
         String message = editorArea.getText();   //获取输入框的内容
         String toUserName = chatUniversalData.getToUserName();
 
-        //如果未输入内容，提示先输入内容
-        if ("".equals(message.strip())) {   //如果输入框为空，不发送消息
-            JOptionPane.showMessageDialog(null, "消息不能为空", "错误", JOptionPane.ERROR_MESSAGE);
+        if (Objects.equals(chatUniversalData.getToUserName(), null)) {
+            //如果未选择发送对象，提示
+            JOptionPane.showMessageDialog(null, "请选择聊天对象", "提示", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }else if ("".equals(message.strip())) {   //如果输入框为空，不发送消息
+            JOptionPane.showMessageDialog(null, "消息不能为空", "提示", JOptionPane.INFORMATION_MESSAGE);
             editorArea.setText("");   //清空输入框
             return;
-        }
-        //如果未选择用户，提示先选择用户
-        if (Objects.equals(chatUniversalData.getToUserName(), null)) {
-            JOptionPane.showMessageDialog(null, "请选择聊天对象", "错误", JOptionPane.ERROR_MESSAGE);
+        }else if (message.length() > 1000) {
+            String tip = "消息长度不能超过1000\n请删除" + (message.length() - 1000) + "个字";
+            JOptionPane.showMessageDialog(null, tip, "提示", JOptionPane.INFORMATION_MESSAGE);
             return;
-        }
-        //如果选择的用户是自己，提示不能选择自己
-        if (Objects.equals(chatUniversalData.getToUserName(), chatUniversalData.getUserName())) {
-            JOptionPane.showMessageDialog(null, "不能选择自己", "错误", JOptionPane.ERROR_MESSAGE);
+        }else if (Objects.equals(chatUniversalData.getToUserName(), chatUniversalData.getUserName())) {
+            //如果选择的用户是自己，提示不能选择自己
+            JOptionPane.showMessageDialog(null, "不能选择自己", "提示", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         editorArea.setText("");   //清空输入框
