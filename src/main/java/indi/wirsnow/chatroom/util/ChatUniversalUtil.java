@@ -37,6 +37,7 @@ public class ChatUniversalUtil {
     public static void appendAndFlush(JTextArea textArea, String message) {
         textArea.append(message);
         textArea.paintImmediately(textArea.getBounds());
+        textArea.selectAll();
     }
 
     /**

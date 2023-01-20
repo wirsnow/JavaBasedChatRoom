@@ -16,9 +16,9 @@ import static indi.wirsnow.chatroom.util.ChatUniversalUtil.addGridBagComponent;
  * @description : 右侧功能面板
  */
 public class ChatRightPanel {
-    private static final JPanel functionPanel = new JPanel();           // 功能面板
-    private static final JButton connectButton = new JButton("连接");      // 连接按钮
-    private static final JButton disconnectButton = new JButton("断开");   // 断开按钮
+    private final JPanel functionPanel = new JPanel();           // 功能面板
+    private final JButton connectButton = new JButton("连接");      // 连接按钮
+    private final JButton disconnectButton = new JButton("断开");   // 断开按钮
     private final JFrame frame;                 // 父窗口
     private final ChatFrameListener listener;   // 监听器
     private final ChatUniversalData chatUniversalData;

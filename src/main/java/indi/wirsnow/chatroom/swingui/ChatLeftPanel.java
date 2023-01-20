@@ -14,12 +14,12 @@ import static indi.wirsnow.chatroom.util.ChatUniversalUtil.*;
  * @description : 左侧聊天面板
  */
 public class ChatLeftPanel {
-    private static final JPanel messagePanel = new JPanel();            // 聊天面板
-    private static final JToolBar toolBar = new JToolBar();             // 总工具栏
-    private static final JButton sendButton = new JButton("发送");  // 发送按钮
-    private static final JButton sendAudioButton = new JButton();       // 语音按钮
-    private static final JButton sendFileButton = new JButton();        // 文件按钮
-    private static final JButton screenshotsButton = new JButton();     // 截图按钮
+    private final JPanel messagePanel = new JPanel();            // 聊天面板
+    private final JToolBar toolBar = new JToolBar();             // 总工具栏
+    private final JButton sendButton = new JButton("发送");  // 发送按钮
+    private final JButton sendAudioButton = new JButton();       // 语音按钮
+    private final JButton sendFileButton = new JButton();        // 文件按钮
+    private final JButton screenshotsButton = new JButton();     // 截图按钮
     private final JFrame frame;             // 父窗口
     private final ChatFrameListener listener; // 监听器
     private final ChatUniversalData chatUniversalData;
