@@ -50,7 +50,6 @@ public class ChatLoginFrame {
         cancelButton.setPreferredSize(new Dimension(100, 30));
         cancelButton.addActionListener(e -> System.exit(0));
 
-
         // 登录按钮
         loginButton.setPreferredSize(new Dimension(100, 30));
         loginButton.setVerticalAlignment(SwingConstants.BOTTOM);

@@ -45,8 +45,8 @@ public class ClientThreadStart {
                 PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
                 writer.println("Server-MyUserName-to:" + chatUniversalData.getUserName());
                 // 断开与服务器的连接
-                threadPool.execute(()->{
-                    while(chatUniversalData.getConnected()){
+                threadPool.execute(() -> {
+                    while (chatUniversalData.getConnected()) {
                         try {
                             Thread.sleep(50);
                         } catch (InterruptedException e) {
@@ -69,6 +69,5 @@ public class ClientThreadStart {
                 e.printStackTrace();
             }
         });
-
     }
 }

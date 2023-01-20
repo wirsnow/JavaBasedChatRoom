@@ -18,10 +18,10 @@ public class ServerMessageOutput {
         if (Objects.equals(toUserName, "所有人")) {
             for (String userName : chatUniversalData.getAllOnlineUser().keySet()) {
                 Socket socket = chatUniversalData.getAllOnlineUser().get(userName);
-                PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()),true);
+                PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
                 reverseAnalysis(writer, message);
             }
-        }else {
+        } else {
             Socket socket = chatUniversalData.getAllOnlineUser().get(toUserName);
             PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
             reverseAnalysis(writer, message);

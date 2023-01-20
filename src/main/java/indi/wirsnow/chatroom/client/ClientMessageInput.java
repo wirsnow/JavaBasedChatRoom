@@ -2,7 +2,6 @@ package indi.wirsnow.chatroom.client;
 
 import indi.wirsnow.chatroom.util.ChatUniversalData;
 
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.Socket;

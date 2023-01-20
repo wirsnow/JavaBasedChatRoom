@@ -59,7 +59,6 @@ public class ChatRightPanel {
             } else {
                 addGridBagComponent(functionPanel, gridBagLayout, gridBagConstraints, portField, 0, 0, 2, 1, 1, 0); // 添加组件
             }
-
         }
 
         // 添加连接与断开按钮

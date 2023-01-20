@@ -19,14 +19,12 @@ import static indi.wirsnow.chatroom.util.ChatUniversalUtil.flushUserList;
 public class ServerMessageInput implements Runnable {
     private final Map<String, Socket> allOnlineUser;
     private final ChatUniversalData chatUniversalData;
-
     private final Socket socket;
 
     public ServerMessageInput(Socket socket, ChatUniversalData chatUniversalData) {
         this.socket = socket;
         this.allOnlineUser = chatUniversalData.getAllOnlineUser();
         this.chatUniversalData = chatUniversalData;
-
     }
 
     /**

@@ -37,8 +37,7 @@ public class ServerThreadStart {
         int port = Integer.parseInt(chatUniversalData.getPortField().getText());
         threadPool.execute(() -> {
             // 创建服务器端ServerSocket，指定绑定的端口，并监听此端口
-            try(ServerSocket serverSocket = new ServerSocket(port)) {
-
+            try (ServerSocket serverSocket = new ServerSocket(port)) {
                 System.out.println("服务器启动成功");
                 chatUniversalData.setConnected(true);
                 appendAndFlush(messageArea, "服务器启动成功，等待客户端连接...\n");
@@ -72,7 +71,6 @@ public class ServerThreadStart {
                         e.printStackTrace();
                     }
                 }
-
             } catch (IOException e) {
                 chatUniversalData.setConnected(false);
                 JOptionPane.showMessageDialog(null, "端口号已被占用" + e, "错误", JOptionPane.ERROR_MESSAGE);
