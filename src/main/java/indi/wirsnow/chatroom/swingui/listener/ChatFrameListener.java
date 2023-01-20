@@ -1,6 +1,8 @@
 package indi.wirsnow.chatroom.swingui.listener;
 
+import indi.wirsnow.chatroom.client.ClientMessageOutput;
 import indi.wirsnow.chatroom.client.ClientThreadStart;
+import indi.wirsnow.chatroom.server.ServerMessageOutput;
 import indi.wirsnow.chatroom.server.ServerThreadStart;
 import indi.wirsnow.chatroom.util.ChatUniversalData;
 import org.jetbrains.annotations.NotNull;
@@ -12,10 +14,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
 
@@ -190,24 +192,12 @@ public class ChatFrameListener implements ActionListener {
         messageArea.append(text + "\n");    //将消息发送到显示框(本地)
 
         try {
-            PrintWriter writer = new PrintWriter(new OutputStreamWriter(chatUniversalData.getSocket().getOutputStream()), true);
-            String[] strs = message.split("\n");
-            System.out.println("strs=" + Arrays.toString(strs) + ",strs.length=" + strs.length);
-            if (strs.length <= 1) {
-                text = toUserName + "-to:" + "text://" + message;       //拼接消息
-                System.out.println(text);
-                writer.println(text);
+            if (Objects.equals(userName, "Server")) {
+                ServerMessageOutput serverMessageOutput = new ServerMessageOutput();
+                serverMessageOutput.sendMessage(chatUniversalData, toUserName, message);
             } else {
-                writer.println(toUserName + "-to:texs://start");
-                for (String string : strs) {
-                    switch (string) {
-                        case "start" -> string = "startstart";
-                        case "newline" -> string = "newlinenewline";
-                        case "\n", "\r", "" -> string = "newline";
-                    }
-                    writer.println(toUserName + "-to:texs://" + string + "\n");
-                    System.out.println("已发送" + string + " " + writer.checkError());
-                }
+                ClientMessageOutput clientMessageOutput = new ClientMessageOutput();
+                clientMessageOutput.sendMessage(chatUniversalData, toUserName, message);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -2,10 +2,11 @@ package indi.wirsnow.chatroom.client;
 
 import indi.wirsnow.chatroom.util.ChatUniversalData;
 
-import javax.swing.*;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.Objects;
 
 import static indi.wirsnow.chatroom.util.ChatMessageParse.parseMessage;
 import static indi.wirsnow.chatroom.util.ChatUniversalUtil.appendAndFlush;
@@ -35,12 +36,14 @@ public class ClientMessageInput {
         BufferedReader reader;
         try {
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            while (true) {
+            while (chatUniversalData.getConnected()) {
                 message = reader.readLine();
+                if (message == null || Objects.equals(message.strip(), "")) {
+                    continue;
+                }
                 System.out.println("收到消息：" + message);
-                JTextArea messageArea = chatUniversalData.getMessageArea();
                 message = parseMessage(chatUniversalData, message);
-                appendAndFlush(messageArea, message);
+                appendAndFlush(chatUniversalData.getMessageArea(), message);
             }
         } catch (Exception e) {
             e.printStackTrace();
