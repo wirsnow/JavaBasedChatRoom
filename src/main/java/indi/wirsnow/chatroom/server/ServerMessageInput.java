@@ -62,6 +62,7 @@ public class ServerMessageInput implements Runnable {
                     System.out.println("用户" + result + "上线");
                     flushUserList(chatUniversalData);
                     userName = result;
+                    out.println("Server-from:list://" + allOnlineUser.keySet());
                     continue;
                 }
                 switch (result) {

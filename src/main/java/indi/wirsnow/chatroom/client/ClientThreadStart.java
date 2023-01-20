@@ -3,6 +3,7 @@ package indi.wirsnow.chatroom.client;
 import indi.wirsnow.chatroom.util.ChatUniversalData;
 
 import javax.swing.*;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -43,6 +44,23 @@ public class ClientThreadStart {
                 flushUserList(chatUniversalData);
                 PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
                 writer.println("Server-MyUserName-to:" + chatUniversalData.getUserName());
+                // 断开与服务器的连接
+                threadPool.execute(()->{
+                    while(chatUniversalData.getConnected()){
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    try {
+                        socket.close();
+                        JOptionPane.showMessageDialog(null, "与服务器断开连接", "提示", JOptionPane.INFORMATION_MESSAGE);
+                        threadPool.shutdownNow();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
                 // 运行ClientMessageInput
                 new ClientMessageInput(socket, chatUniversalData);
             } catch (Exception e) {

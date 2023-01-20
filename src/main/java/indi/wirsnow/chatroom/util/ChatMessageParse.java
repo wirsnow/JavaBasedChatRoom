@@ -1,6 +1,5 @@
 package indi.wirsnow.chatroom.util;
 
-import javax.swing.*;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -51,12 +50,10 @@ public class ChatMessageParse {
                 if (Objects.equals(fromUserName, "Server")) {
                     Map<String, Socket> allOnlineUser = new TreeMap<>();
                     // string转map
-                    String[] strings = message.split(",");
+                    String[] strings = message.substring(1, message.length() - 1).split(", ");
                     for (String str : strings) {
-                        String[] s = str.split("=");
-                        allOnlineUser.put(s[0], null);
+                        allOnlineUser.put(str, null);
                     }
-                    JOptionPane.showMessageDialog(null, allOnlineUser.toString(), "错误", JOptionPane.ERROR_MESSAGE);
                     chatUniversalData.setAllOnlineUser(allOnlineUser);
                     flushUserList(chatUniversalData);
                     return null;

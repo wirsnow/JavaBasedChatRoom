@@ -6,10 +6,10 @@ import javax.swing.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
 import java.util.concurrent.*;
 
 import static indi.wirsnow.chatroom.util.ChatUniversalUtil.appendAndFlush;
-
 
 /**
  * @author : wirsnow
@@ -37,13 +37,34 @@ public class ServerThreadStart {
         int port = Integer.parseInt(chatUniversalData.getPortField().getText());
         threadPool.execute(() -> {
             // 创建服务器端ServerSocket，指定绑定的端口，并监听此端口
-            try (ServerSocket serverSocket = new ServerSocket(port)) {
+            try(ServerSocket serverSocket = new ServerSocket(port)) {
+
                 System.out.println("服务器启动成功");
                 chatUniversalData.setConnected(true);
                 appendAndFlush(messageArea, "服务器启动成功，等待客户端连接...\n");
-                while (true) {
+                threadPool.execute(() -> {
+                    // 关闭所有连接
+                    while (chatUniversalData.getConnected()) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
                     try {
-                        // 调用accept()方法开始监听，等待客户端的连接
+                        for (Map.Entry<String, Socket> entry : chatUniversalData.getAllOnlineUser().entrySet()) {
+                            entry.getValue().close();
+                        }
+                        serverSocket.close();
+                        JOptionPane.showMessageDialog(null, "已断开与网络的连接", "提示", JOptionPane.INFORMATION_MESSAGE);
+                        threadPool.shutdownNow();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                // 调用accept()方法开始监听，等待客户端的连接
+                while (chatUniversalData.getConnected()) {
+                    try {
                         Socket socket = serverSocket.accept();
                         chatUniversalData.setSocket(socket);
                         threadPool.execute(new ServerMessageInput(socket, chatUniversalData));
@@ -51,9 +72,10 @@ public class ServerThreadStart {
                         e.printStackTrace();
                     }
                 }
-            } catch (Exception e) {
+
+            } catch (IOException e) {
                 chatUniversalData.setConnected(false);
-                JOptionPane.showMessageDialog(null, "端口号已被占用", "错误", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "端口号已被占用" + e, "错误", JOptionPane.ERROR_MESSAGE);
             }
         });
     }

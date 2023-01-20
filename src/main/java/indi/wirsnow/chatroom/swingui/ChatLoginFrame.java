@@ -59,6 +59,8 @@ public class ChatLoginFrame {
             userName = userNameField.getText();
             if (userName.equals("")) {
                 JOptionPane.showMessageDialog(frame, "用户名不能为空", "错误", JOptionPane.ERROR_MESSAGE);
+            } else if (userName.contains(" ")) {
+                JOptionPane.showMessageDialog(frame, "用户名不能包含空格", "错误", JOptionPane.ERROR_MESSAGE);
             } else if (userName.equals("Server") || userName.equals("Server-MyUserName") || userName.equals("所有人")) {
                 JOptionPane.showMessageDialog(frame, "名称中含有非法字符", "错误", JOptionPane.ERROR_MESSAGE);
             } else {
