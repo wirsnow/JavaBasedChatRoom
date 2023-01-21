@@ -21,6 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
+import static indi.wirsnow.chatroom.util.ChatUniversalUtil.fileToBase64;
+
 /**
  * @author : wirsnow
  * @date : 2022/12/10 14:53
@@ -73,32 +75,13 @@ public class ChatFrameListener implements ActionListener {
     }
 
     /**
-     * 发送文件
-     */
-    private void sendFile() throws IOException {
-
-        JFileChooser fileChooser = new JFileChooser();  //创建文件选择器
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);   //设置只能选择文件
-        fileChooser.showDialog(new JLabel(), "选择");  //打开文件选择器
-        File file = fileChooser.getSelectedFile();  //获取选择的文件
-        if (file == null) {
-            return;
-        } else if (file.length() > 1024 * 1024 * 100) {
-            JOptionPane.showMessageDialog(null, "文件大小不能超过100M", "错误", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        chatUniversalData.out.println("file://" + file);
-        messageArea.append(chatUniversalData.out.toString());
-    }
-
-    /**
      * @param e the event to be processed
      */
     @Override
     public void actionPerformed(@NotNull ActionEvent e) {
         String result = e.getActionCommand();
         switch (result) {
-            case "send" -> send();
+            case "send" -> sendText();
             case "screenshots" -> {
                 try {
                     screenshots();
@@ -113,13 +96,7 @@ public class ChatFrameListener implements ActionListener {
                     throw new RuntimeException(ex);
                 }
             }
-            case "sendFile" -> {
-                try {
-                    sendFile();
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
+            case "sendFile" -> sendFile();
             case "connect" -> {
                 if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
                     serverConnect();
@@ -136,6 +113,99 @@ public class ChatFrameListener implements ActionListener {
             }
             default -> throw new IllegalStateException("Unexpected value: " + result);
         }
+    }
+
+    /**
+     * 发送消息
+     */
+    private void sendText() {
+        Date date = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
+        String time = dateFormat.format(date);
+        String message = editorArea.getText();   //获取输入框的内容
+        String toUserName = chatUniversalData.getToUserName();
+
+        if (Objects.equals(chatUniversalData.getToUserName(), null)) {
+            // 如果未选择发送对象
+            JOptionPane.showMessageDialog(null, "请选择聊天对象", "提示", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        } else if (Objects.equals(chatUniversalData.getToUserName(), chatUniversalData.getUserName())) {
+            // 如果选择的用户是自己
+            JOptionPane.showMessageDialog(null, "不能选择自己", "提示", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        } else if ("".equals(message.strip())) {
+            // 如果输入框为空
+            JOptionPane.showMessageDialog(null, "消息不能为空", "提示", JOptionPane.INFORMATION_MESSAGE);
+            editorArea.setText("");   //清空输入框
+            return;
+        } else if (message.length() > 1000) {
+            // 如果输入框内容超过1000个字符
+            String tip = "消息长度不能超过1000\n请删除" + (message.length() - 1000) + "个字";
+            JOptionPane.showMessageDialog(null, tip, "提示", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        editorArea.setText("");   //清空输入框
+
+        String userName = chatUniversalData.getUserName();
+        String text = userName + " " + time + "\n" + message;   //拼接消息
+        messageArea.append(text + "\n");    //将消息发送到显示框(本地)
+
+        try {
+            if (Objects.equals(userName, "Server")) {
+                serverMessageOutput.sendTextMessage(chatUniversalData, toUserName, message);
+            } else {
+                clientMessageOutput.sendTextMessage(chatUniversalData, toUserName, message);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 发送文件
+     */
+    private void sendFile() {
+        if (Objects.equals(chatUniversalData.getToUserName(), null)) {
+            // 如果未选择发送对象
+            JOptionPane.showMessageDialog(null, "请选择聊天对象", "提示", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        } else if (Objects.equals(chatUniversalData.getToUserName(), chatUniversalData.getUserName())) {
+            // 如果选择的用户是自己
+            JOptionPane.showMessageDialog(null, "不能选择自己", "提示", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        JFileChooser fileChooser = new JFileChooser();  //创建文件选择器
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);   //设置只能选择文件
+        fileChooser.showDialog(new JLabel(), "选择");  //打开文件选择器
+        File file = fileChooser.getSelectedFile();  //获取选择的文件
+
+        if (file == null) {
+            return;
+        } else if (file.length() > 1024 * 1024 * 100) {
+            JOptionPane.showMessageDialog(null, "文件大小不能超过100M", "错误", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Date date = new Date();
+        String fileName = file.getName();
+        String base64 = fileToBase64(file);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
+        String time = dateFormat.format(date);
+        String userName = chatUniversalData.getUserName();
+        String toUserName = chatUniversalData.getToUserName();
+        if (Objects.equals(base64, "") || base64 == null) base64 = "0";
+
+        try {
+            if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
+                serverMessageOutput.sendFile(chatUniversalData, toUserName, fileName, base64);
+            } else {
+                clientMessageOutput.sendFile(chatUniversalData, toUserName, fileName, base64);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        messageArea.append(userName + " " + time + "\n已发送文件: " + fileName + "\n");    //将消息发送到显示框(本地)
     }
 
     /**
@@ -185,54 +255,11 @@ public class ChatFrameListener implements ActionListener {
             chatUniversalData.getUserField().setText("当前在线: 0");
             try {
                 clientMessageOutput.sendDisconnectMessage(chatUniversalData);
-            } catch (IOException ignored) {}
-        }
-
-    }
-
-    /**
-     * 发送消息
-     */
-    private void send() {
-        Date date = new Date();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
-        String time = dateFormat.format(date);
-        String message = editorArea.getText();   //获取输入框的内容
-        String toUserName = chatUniversalData.getToUserName();
-
-        if (Objects.equals(chatUniversalData.getToUserName(), null)) {
-            // 如果未选择发送对象
-            JOptionPane.showMessageDialog(null, "请选择聊天对象", "提示", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        } else if (Objects.equals(chatUniversalData.getToUserName(), chatUniversalData.getUserName())) {
-            // 如果选择的用户是自己
-            JOptionPane.showMessageDialog(null, "不能选择自己", "提示", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        } else if ("".equals(message.strip())) {
-            // 如果输入框为空
-            JOptionPane.showMessageDialog(null, "消息不能为空", "提示", JOptionPane.INFORMATION_MESSAGE);
-            editorArea.setText("");   //清空输入框
-            return;
-        } else if (message.length() > 1000) {
-            // 如果输入框内容超过1000个字符
-            String tip = "消息长度不能超过1000\n请删除" + (message.length() - 1000) + "个字";
-            JOptionPane.showMessageDialog(null, tip, "提示", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        editorArea.setText("");   //清空输入框
-
-        String userName = chatUniversalData.getUserName();
-        String text = userName + " " + time + "\n" + message;   //拼接消息
-        messageArea.append(text + "\n");    //将消息发送到显示框(本地)
-
-        try {
-            if (Objects.equals(userName, "Server")) {
-                serverMessageOutput.sendMessage(chatUniversalData, toUserName, message);
-            } else {
-                clientMessageOutput.sendTextMessage(chatUniversalData, toUserName, message);
+            } catch (IOException ignored) {
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
+
     }
+
+
 }

@@ -5,6 +5,7 @@ import indi.wirsnow.chatroom.util.ChatUniversalData;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.Socket;
 
 /**
  * @author : wirsnow
@@ -12,6 +13,13 @@ import java.io.PrintWriter;
  * @description : 客户端发送消息类
  */
 public class ClientMessageOutput {
+
+    public void sendFile(ChatUniversalData chatUniversalData, String toUserName, String fileName, String base64) throws IOException {
+        Socket socket = chatUniversalData.getSocket();
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+        writer.println(toUserName + "-to:file://" + fileName + "-name:" + base64);
+    }
+
     public void sendDisconnectMessage(ChatUniversalData chatUniversalData) throws IOException {
         PrintWriter out = new PrintWriter(new OutputStreamWriter(chatUniversalData.getSocket().getOutputStream()), true);
         out.println(chatUniversalData.getUserName() + "-to:LogOut");
@@ -23,12 +31,11 @@ public class ClientMessageOutput {
         if (strs.length <= 1) {
             writer.println(toUserName + "-to:" + "text://" + message);
         } else {
-            writer.println(toUserName + "-to:texs://start");
+            writer.println(toUserName + "-to:texs://☩");
             for (String string : strs) {
                 switch (string) {
-                    case "start" -> string = "startstart";
-                    case "newline" -> string = "newlinenewline";
-                    case "\n", "\r", "" -> string = "newline";
+                    case "☩", "❊" -> string = "□";
+                    case "\n", "\r", "" -> string = "❊";
                 }
                 writer.println(toUserName + "-to:texs://" + string + "\n");
             }

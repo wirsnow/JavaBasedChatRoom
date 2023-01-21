@@ -14,7 +14,22 @@ import java.util.Objects;
  * @description : 服务端发送消息类
  */
 public class ServerMessageOutput {
-    public void sendMessage(ChatUniversalData chatUniversalData, String toUserName, String message) throws IOException {
+    public void sendFile(ChatUniversalData chatUniversalData, String toUserName, String fileName, String base64) throws IOException {
+        if (Objects.equals(toUserName, "所有人")) {
+            for (String userName : chatUniversalData.getAllOnlineUser().keySet()) {
+                Socket socket = chatUniversalData.getAllOnlineUser().get(userName);
+                PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+                writer.println("Server-from:file://" + fileName + "-name:" + base64);
+            }
+        } else {
+            Socket socket = chatUniversalData.getAllOnlineUser().get(toUserName);
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+            writer.println("Server-from:file://" + fileName + "-name:" + base64);
+        }
+
+    }
+
+    public void sendTextMessage(ChatUniversalData chatUniversalData, String toUserName, String message) throws IOException {
         if (Objects.equals(toUserName, "所有人")) {
             for (String userName : chatUniversalData.getAllOnlineUser().keySet()) {
                 Socket socket = chatUniversalData.getAllOnlineUser().get(userName);
@@ -33,12 +48,11 @@ public class ServerMessageOutput {
         if (strs.length <= 1) {
             writer.println("Server-from:text://" + message);
         } else {
-            writer.println("Server-from:texs://start");
+            writer.println("Server-from:texs://☩");
             for (String string : strs) {
                 switch (string) {
-                    case "start" -> string = "startstart";
-                    case "newline" -> string = "newlinenewline";
-                    case "\n", "\r", "" -> string = "newline";
+                    case "☩", "❊" -> string = "□";
+                    case "\n", "\r", "" -> string = "❊";
                 }
                 writer.println("Server-from:texs://" + string + "\n");
             }

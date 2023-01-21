@@ -4,6 +4,8 @@ import indi.wirsnow.chatroom.swingui.listener.ChatFrameListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.*;
+import java.util.Base64;
 import java.util.Objects;
 
 /**
@@ -12,6 +14,65 @@ import java.util.Objects;
  * @description : 服务端与客户端共用的工具类
  */
 public class ChatUniversalUtil {
+
+    /**
+     * 读取文件并转换为Base64编码
+     *
+     * @param file 文件
+     * @return Base64编码
+     */
+    public static String fileToBase64(File file) {
+        // 读取文件
+        try (InputStream in = new FileInputStream(file)) {
+            // 创建一个字节数组, 长度为文件长度
+            byte[] bytes = new byte[(int) file.length()];
+            // 读取文件到字节数组中, 返回读取的字节数
+            int byteNum = in.read(bytes);
+            // 如果读取成功, 转换为Base64编码
+            if (byteNum > 0) {
+                return Base64.getEncoder().encodeToString(bytes);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 将base64编码字符串转换为文件
+     *
+     * @param base64   base64编码字符串
+     * @param fileName 文件名
+     * @return 文件路径
+     */
+    public static String base64ToFile(ChatUniversalData chatUniversalData, String base64, String fileName) {
+        // 获取当前目录
+        String userName = chatUniversalData.getUserName()
+                .replace("\\", "").replace("/", "")
+                .replace(":", "").replace("*", "")
+                .replace("?", "").replace("\"", "")
+                .replace("<", "").replace(">", "")
+                .replace("|", "");  // 防止文件夹名称中包含非法字符
+        String thisPath = System.getProperty("user.dir") + "\\file-" + userName;
+        // 如果目录不存在, 创建目录
+        File dir = new File(thisPath);
+        if (!dir.exists() && !dir.isDirectory()) {
+            dir.mkdirs();
+        }
+        // 创建文件
+        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(thisPath + "/" + fileName))) {
+            if (Objects.equals(base64, "0")) {
+                out.write("".getBytes());
+            } else {
+                byte[] bytes = Base64.getDecoder().decode(base64);
+                out.write(bytes);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return thisPath;
+    }
+
     /**
      * 刷新在线用户列表
      *
