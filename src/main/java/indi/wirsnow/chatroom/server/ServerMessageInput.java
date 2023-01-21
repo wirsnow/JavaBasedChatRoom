@@ -40,7 +40,7 @@ public class ServerMessageInput implements Runnable {
         try {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter((new OutputStreamWriter(socket.getOutputStream())), true);
-            while (true) {
+            while (chatUniversalData.getConnected()) {
                 message = in.readLine();
                 if (message == null || Objects.equals(message.strip(), "")) {
                     continue;
@@ -57,10 +57,17 @@ public class ServerMessageInput implements Runnable {
                 String result = messageContent.toString();    //  消息内容
                 if (Objects.equals(targetUser, "Server-MyUserName")) {
                     allOnlineUser.put(result, socket);
-                    System.out.println("用户" + result + "上线");
                     flushUserList(chatUniversalData);
                     userName = result;
                     out.println("Server-from:list://" + allOnlineUser.keySet());
+
+                    for (Map.Entry<String, Socket> entry : allOnlineUser.entrySet()) {
+                        if (entry.getValue() != null) {
+                            Socket targetSocket = entry.getValue();
+                            PrintWriter outTemp = new PrintWriter((new OutputStreamWriter(targetSocket.getOutputStream())), true);
+                            outTemp.println("Server-from:logi://" + userName);
+                        }
+                    }
                     continue;
                 }
                 switch (result) {
@@ -82,7 +89,6 @@ public class ServerMessageInput implements Runnable {
                     default -> {
                         if (Objects.equals(targetUser, "Server")) {
                             message = userName + "-from:" + result;
-                            System.out.println(message);
                             result = parseMessage(chatUniversalData, message);
                             appendAndFlush(chatUniversalData.getMessageArea(), result);
                         } else {

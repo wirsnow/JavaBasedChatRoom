@@ -12,7 +12,12 @@ import java.io.PrintWriter;
  * @description : 客户端发送消息类
  */
 public class ClientMessageOutput {
-    public void sendMessage(ChatUniversalData chatUniversalData, String toUserName, String message) throws IOException {
+    public void sendDisconnectMessage(ChatUniversalData chatUniversalData) throws IOException {
+        PrintWriter out = new PrintWriter(new OutputStreamWriter(chatUniversalData.getSocket().getOutputStream()), true);
+        out.println(chatUniversalData.getUserName() + "-to:LogOut");
+    }
+
+    public void sendTextMessage(ChatUniversalData chatUniversalData, String toUserName, String message) throws IOException {
         PrintWriter writer = new PrintWriter(new OutputStreamWriter(chatUniversalData.getSocket().getOutputStream()), true);
         String[] strs = message.split("\n");
         if (strs.length <= 1) {

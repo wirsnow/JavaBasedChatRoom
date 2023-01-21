@@ -19,16 +19,16 @@ public class ServerMessageOutput {
             for (String userName : chatUniversalData.getAllOnlineUser().keySet()) {
                 Socket socket = chatUniversalData.getAllOnlineUser().get(userName);
                 PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
-                reverseAnalysis(writer, message);
+                messageModify(writer, message);
             }
         } else {
             Socket socket = chatUniversalData.getAllOnlineUser().get(toUserName);
             PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
-            reverseAnalysis(writer, message);
+            messageModify(writer, message);
         }
     }
 
-    private void reverseAnalysis(PrintWriter writer, String message) {
+    private void messageModify(PrintWriter writer, String message) {
         String[] strs = message.split("\n");
         if (strs.length <= 1) {
             writer.println("Server-from:text://" + message);

@@ -17,7 +17,7 @@ import static indi.wirsnow.chatroom.util.ChatUniversalUtil.flushUserList;
  */
 public class ChatMessageParse {
     public static String parseMessage(ChatUniversalData chatUniversalData, String message) {
-        String[] messageArray = message.split("-from:");
+        String[] messageArray = message.split("-from:");    // 消息格式：发送者-from:消息类型://消息内容
         String fromUserName = messageArray[0];
         StringBuilder messageContent = new StringBuilder();
         for (int i = 1; i < messageArray.length; i++) {
@@ -32,16 +32,14 @@ public class ChatMessageParse {
         switch (command) {
             case "logi" -> {
                 if (Objects.equals(fromUserName, "Server")) {
-                    Map<String, Socket> map = chatUniversalData.getAllOnlineUser();
-                    map.put(message, null);
+                    chatUniversalData.getAllOnlineUser().put(message, null);
                     flushUserList(chatUniversalData);
                     return null;
                 }
             }
             case "exit" -> {
                 if (Objects.equals(fromUserName, "Server")) {
-                    Map<String, Socket> map = chatUniversalData.getAllOnlineUser();
-                    map.remove(message);
+                    chatUniversalData.getAllOnlineUser().remove(message);
                     flushUserList(chatUniversalData);
                     return null;
                 }

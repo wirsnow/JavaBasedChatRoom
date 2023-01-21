@@ -30,6 +30,8 @@ public class ChatFrameListener implements ActionListener {
     private final JTextArea messageArea;
     private final JTextArea editorArea;
     private final ChatUniversalData chatUniversalData;
+    private final ServerMessageOutput serverMessageOutput = new ServerMessageOutput();
+    private final ClientMessageOutput clientMessageOutput = new ClientMessageOutput();
 
 
     public ChatFrameListener(ChatUniversalData chatUniversalData) {
@@ -122,10 +124,16 @@ public class ChatFrameListener implements ActionListener {
                 if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
                     serverConnect();
                 } else {
-                    client2server();
+                    clientConnect();
                 }
             }
-            case "disconnect" -> disconnect();
+            case "disconnect" -> {
+                if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
+                    serverDisconnect();
+                } else {
+                    clientDisconnect();
+                }
+            }
             default -> throw new IllegalStateException("Unexpected value: " + result);
         }
     }
@@ -144,7 +152,7 @@ public class ChatFrameListener implements ActionListener {
     /**
      * 客户端连接到服务器
      */
-    private void client2server() {
+    private void clientConnect() {
         if (chatUniversalData.getConnected()) {
             JOptionPane.showMessageDialog(null, "客户端已连接，请勿重复点击", "错误", JOptionPane.ERROR_MESSAGE);
         } else {
@@ -153,10 +161,33 @@ public class ChatFrameListener implements ActionListener {
     }
 
     /**
-     * 断开连接
+     * 服务器断开网络
      */
-    private void disconnect() {
-        chatUniversalData.setConnected(false);
+    private void serverDisconnect() {
+        if (!chatUniversalData.getConnected()) {
+            JOptionPane.showMessageDialog(null, "服务器已断开，请勿重复点击", "错误", JOptionPane.ERROR_MESSAGE);
+        } else {
+            chatUniversalData.setConnected(false);
+            chatUniversalData.getUserList().setModel(new DefaultListModel<>());
+            chatUniversalData.getUserField().setText("当前在线: 0");
+        }
+    }
+
+    /**
+     * 客户端断开连接
+     */
+    private void clientDisconnect() {
+        if (!chatUniversalData.getConnected()) {
+            JOptionPane.showMessageDialog(null, "客户端已断开，请勿重复点击", "错误", JOptionPane.ERROR_MESSAGE);
+        } else {
+            chatUniversalData.setConnected(false);
+            chatUniversalData.getUserList().setModel(new DefaultListModel<>());
+            chatUniversalData.getUserField().setText("当前在线: 0");
+            try {
+                clientMessageOutput.sendDisconnectMessage(chatUniversalData);
+            } catch (IOException ignored) {}
+        }
+
     }
 
     /**
@@ -196,11 +227,9 @@ public class ChatFrameListener implements ActionListener {
 
         try {
             if (Objects.equals(userName, "Server")) {
-                ServerMessageOutput serverMessageOutput = new ServerMessageOutput();
                 serverMessageOutput.sendMessage(chatUniversalData, toUserName, message);
             } else {
-                ClientMessageOutput clientMessageOutput = new ClientMessageOutput();
-                clientMessageOutput.sendMessage(chatUniversalData, toUserName, message);
+                clientMessageOutput.sendTextMessage(chatUniversalData, toUserName, message);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
