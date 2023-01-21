@@ -147,8 +147,8 @@ public class ChatFrameListener implements ActionListener {
         editorArea.setText("");   //清空输入框
 
         String userName = chatUniversalData.getUserName();
-        String text = userName + " " + time + "\n" + message;   //拼接消息
-        messageArea.append(text + "\n");    //将消息发送到显示框(本地)
+        String text = userName + " " + time + " -> " + toUserName + "\n" + message + "\n";   //拼接消息
+        messageArea.append(text);    //将消息发送到显示框(本地)
 
         try {
             if (Objects.equals(userName, "Server")) {
@@ -205,7 +205,7 @@ public class ChatFrameListener implements ActionListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        messageArea.append(userName + " " + time + "\n已发送文件: " + fileName + "\n");    //将消息发送到显示框(本地)
+        messageArea.append(userName + " " + time + " -> " + toUserName + "\n已发送文件: " + fileName + "\n");    //将消息发送到显示框(本地)
     }
 
     /**

@@ -45,29 +45,29 @@ public class ClientThreadStart {
                 PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
                 writer.println("Server-MyUserName-to:" + chatUniversalData.getUserName());
                 // 断开与服务器的连接
-                threadPool.execute(() -> {
-                    while (chatUniversalData.getConnected()) {
-                        try {
-                            Thread.sleep(50);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                    try {
-                        socket.close();
-                        JOptionPane.showMessageDialog(null, "与服务器断开连接", "提示", JOptionPane.INFORMATION_MESSAGE);
-                        threadPool.shutdownNow();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                threadPool.execute(() -> disconnect(socket));
                 // 运行ClientMessageInput
                 new ClientMessageInput(socket, chatUniversalData);
             } catch (Exception e) {
-                chatUniversalData.setConnected(false);
                 JOptionPane.showMessageDialog(null, "连接失败\n" + e, "错误", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
             }
         });
+    }
+    private void disconnect(Socket socket) {
+        while (chatUniversalData.getConnected()) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        try {
+            socket.close();
+            JOptionPane.showMessageDialog(null, "与服务器断开连接", "提示", JOptionPane.INFORMATION_MESSAGE);
+            threadPool.shutdownNow();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

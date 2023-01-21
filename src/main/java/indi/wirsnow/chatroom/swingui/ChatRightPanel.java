@@ -87,12 +87,6 @@ public class ChatRightPanel {
             userList.setBackground(Color.WHITE);    // 设置背景颜色
             userList.setFont(new Font("微软雅黑", Font.PLAIN, 14));    // 设置字体
             userList.setBorder(null);               // 设置无边框
-            DefaultListModel<String> dlm = new DefaultListModel<>();            // 创建列表模型
-            if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
-                dlm.add(0, "所有人");
-            }
-            dlm.addAll(chatUniversalData.getAllOnlineUser().keySet());   // 添加所有用户
-            userList.setModel(dlm);     // 设置列表数据
             userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);     // 设置单选模式
             userList.addListSelectionListener(e -> {
                 if (e.getValueIsAdjusting()) {
