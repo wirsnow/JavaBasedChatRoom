@@ -110,9 +110,10 @@ public class ChatUniversalUtil {
      */
     public static void autoBarIcon(JButton button, String iconPath) {
         ImageIcon icon = new ImageIcon("src/main/resources/icons/" + iconPath);
+        // ImageIcon icon = new ImageIcon(ChatUniversalUtil.class.getResource("icons/" + iconPath));
         Image img = icon.getImage();
-        Image newImg = img.getScaledInstance(23, 23, Image.SCALE_SMOOTH);
-        button.setIcon(new ImageIcon(newImg));
+
+        button.setIcon(new ImageIcon(img));
     }
 
     /**
