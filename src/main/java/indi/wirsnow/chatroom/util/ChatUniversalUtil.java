@@ -14,6 +14,23 @@ import java.util.Objects;
  * @description : 服务端与客户端共用的工具类
  */
 public class ChatUniversalUtil {
+    /**
+     * 验证是否选择了正确的用户
+     * @param chatUniversalData 通用数据
+     * @return 是否选择了正确的用户
+     */
+    public static boolean isChooseRightUser(ChatUniversalData chatUniversalData) {
+        if (Objects.equals(chatUniversalData.getToUserName(), null)) {
+            // 如果未选择发送对象
+            JOptionPane.showMessageDialog(null, "请选择聊天对象", "提示", JOptionPane.INFORMATION_MESSAGE);
+            return false;
+        } else if (Objects.equals(chatUniversalData.getToUserName(), chatUniversalData.getUserName())) {
+            // 如果选择的用户是自己
+            JOptionPane.showMessageDialog(null, "不能选择自己", "提示", JOptionPane.INFORMATION_MESSAGE);
+            return false;
+        }
+        return true;
+    }
 
     /**
      * 读取文件并转换为Base64编码

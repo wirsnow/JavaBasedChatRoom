@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.Objects;
 
 import static indi.wirsnow.chatroom.util.ChatUniversalUtil.fileToBase64;
+import static indi.wirsnow.chatroom.util.ChatUniversalUtil.isChooseRightUser;
 
 /**
  * @author : wirsnow
@@ -49,6 +50,7 @@ public class ChatFrameListener implements ActionListener {
      * @throws IOException  保存异常
      */
     private void screenshots() throws AWTException, IOException {
+        if (!isChooseRightUser(chatUniversalData)) return;
         Robot robot = new Robot();
         Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
         BufferedImage image = robot.createScreenCapture(rectangle);
@@ -62,6 +64,7 @@ public class ChatFrameListener implements ActionListener {
      * @throws IOException              保存异常
      */
     private void sendAudio() throws LineUnavailableException, IOException {
+        if (!isChooseRightUser(chatUniversalData)) return;
         AudioFormat format = new AudioFormat(8000F, 16, 2, true, false);
         DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
         TargetDataLine targetDataLine = (TargetDataLine) AudioSystem.getLine(info);
@@ -119,21 +122,14 @@ public class ChatFrameListener implements ActionListener {
      * 发送消息
      */
     private void sendText() {
+        if (!isChooseRightUser(chatUniversalData)) return;
         Date date = new Date();
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
         String time = dateFormat.format(date);
         String message = editorArea.getText();   //获取输入框的内容
         String toUserName = chatUniversalData.getToUserName();
 
-        if (Objects.equals(chatUniversalData.getToUserName(), null)) {
-            // 如果未选择发送对象
-            JOptionPane.showMessageDialog(null, "请选择聊天对象", "提示", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        } else if (Objects.equals(chatUniversalData.getToUserName(), chatUniversalData.getUserName())) {
-            // 如果选择的用户是自己
-            JOptionPane.showMessageDialog(null, "不能选择自己", "提示", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        } else if ("".equals(message.strip())) {
+        if ("".equals(message.strip())) {
             // 如果输入框为空
             JOptionPane.showMessageDialog(null, "消息不能为空", "提示", JOptionPane.INFORMATION_MESSAGE);
             editorArea.setText("");   //清空输入框
@@ -165,15 +161,7 @@ public class ChatFrameListener implements ActionListener {
      * 发送文件
      */
     private void sendFile() {
-        if (Objects.equals(chatUniversalData.getToUserName(), null)) {
-            // 如果未选择发送对象
-            JOptionPane.showMessageDialog(null, "请选择聊天对象", "提示", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        } else if (Objects.equals(chatUniversalData.getToUserName(), chatUniversalData.getUserName())) {
-            // 如果选择的用户是自己
-            JOptionPane.showMessageDialog(null, "不能选择自己", "提示", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
+        if (!isChooseRightUser(chatUniversalData)) return;
 
         JFileChooser fileChooser = new JFileChooser();  //创建文件选择器
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);   //设置只能选择文件
