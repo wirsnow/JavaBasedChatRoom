@@ -8,8 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static indi.wirsnow.chatroom.util.ChatMessageParse.parseMessage;
-import static indi.wirsnow.chatroom.util.ChatUniversalUtil.appendAndFlush;
-import static indi.wirsnow.chatroom.util.ChatUniversalUtil.flushUserList;
+import static indi.wirsnow.chatroom.util.ChatUniversalUtil.*;
 
 /**
  * @author : wirsnow
@@ -90,7 +89,7 @@ public class ServerMessageInput implements Runnable {
                         if (Objects.equals(targetUser, "Server")) {
                             message = userName + "-from:" + result;
                             result = parseMessage(chatUniversalData, message);
-                            appendAndFlush(chatUniversalData.getMessageArea(), result);
+                            messageInsertText(chatUniversalData.getMessagePane(), result);
                         } else {
                             Socket targetSocket = allOnlineUser.get(targetUser);
                             PrintWriter outTemp = new PrintWriter((new OutputStreamWriter(targetSocket.getOutputStream())), true);

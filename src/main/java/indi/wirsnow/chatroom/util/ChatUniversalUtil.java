@@ -15,21 +15,45 @@ import java.util.Objects;
  */
 public class ChatUniversalUtil {
     /**
+     * 立即刷新界面
+     *
+     * @param messagePane 消息区域
+     * @param text 消息
+     */
+    public static void messageInsertText(JTextPane messagePane, String text){
+        if (text == null) return;
+        messagePane.setText(messagePane.getText()+text);
+        // messagePane.paintImmediately(messagePane.getBounds());
+        messagePane.setCaretPosition(messagePane.getText().length());
+    }
+
+    /**
+     * 插入图片，并立即刷新界面
+     *
+     * @param messagePane 消息区域
+     * @param image 图片
+     */
+    public static void messageInsertImage(JTextPane messagePane, ImageIcon image){
+        messagePane.setCaretPosition(messagePane.getDocument().getLength()); // 设置插入位置
+        messagePane.insertIcon(image); // 插入图片
+        messageInsertText(messagePane, "\n"); // 这样做可以换行
+    }
+    /**
      * 验证是否选择了正确的用户
      * @param chatUniversalData 通用数据
      * @return 是否选择了正确的用户
      */
-    public static boolean isChooseRightUser(ChatUniversalData chatUniversalData) {
+    public static boolean isNotChooseRightUser(ChatUniversalData chatUniversalData) {
         if (Objects.equals(chatUniversalData.getToUserName(), null)) {
             // 如果未选择发送对象
             JOptionPane.showMessageDialog(null, "请选择聊天对象", "提示", JOptionPane.INFORMATION_MESSAGE);
-            return false;
+            return true;
         } else if (Objects.equals(chatUniversalData.getToUserName(), chatUniversalData.getUserName())) {
             // 如果选择的用户是自己
             JOptionPane.showMessageDialog(null, "不能选择自己", "提示", JOptionPane.INFORMATION_MESSAGE);
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -105,18 +129,6 @@ public class ChatUniversalUtil {
         dlm.addAll(chatUniversalData.getAllOnlineUser().keySet());  // 添加所有用户
         chatUniversalData.getUserList().setModel(dlm);              // 设置列表模型
         chatUniversalData.getUserField().setText("当前在线: " + chatUniversalData.getAllOnlineUser().size());
-    }
-
-    /**
-     * 立即刷新界面
-     *
-     * @param textArea 文本域
-     * @param message  消息
-     */
-    public static void appendAndFlush(JTextArea textArea, String message) {
-        textArea.append(message);
-        textArea.paintImmediately(textArea.getBounds());
-        textArea.selectAll();
     }
 
     /**

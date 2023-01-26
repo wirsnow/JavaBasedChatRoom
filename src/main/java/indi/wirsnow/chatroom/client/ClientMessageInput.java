@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.Objects;
 
 import static indi.wirsnow.chatroom.util.ChatMessageParse.parseMessage;
-import static indi.wirsnow.chatroom.util.ChatUniversalUtil.appendAndFlush;
+import static indi.wirsnow.chatroom.util.ChatUniversalUtil.messageInsertText;
 
 /**
  * @author : wirsnow
@@ -42,7 +42,7 @@ public class ClientMessageInput {
                 }
                 System.out.println("收到消息：" + message);
                 message = parseMessage(chatUniversalData, message);
-                appendAndFlush(chatUniversalData.getMessageArea(), message);
+                messageInsertText(chatUniversalData.getMessagePane(), message);
             }
         } catch (Exception e) {
             e.printStackTrace();

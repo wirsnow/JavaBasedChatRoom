@@ -21,8 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
-import static indi.wirsnow.chatroom.util.ChatUniversalUtil.fileToBase64;
-import static indi.wirsnow.chatroom.util.ChatUniversalUtil.isChooseRightUser;
+import static indi.wirsnow.chatroom.util.ChatUniversalUtil.*;
 
 /**
  * @author : wirsnow
@@ -30,7 +29,7 @@ import static indi.wirsnow.chatroom.util.ChatUniversalUtil.isChooseRightUser;
  * @description : 接收动作事件的侦听器
  */
 public class ChatFrameListener implements ActionListener {
-    private final JTextArea messageArea;
+    private final JTextPane messagePane;
     private final JTextArea editorArea;
     private final ChatUniversalData chatUniversalData;
     private final ServerMessageOutput serverMessageOutput = new ServerMessageOutput();
@@ -38,7 +37,7 @@ public class ChatFrameListener implements ActionListener {
 
 
     public ChatFrameListener(ChatUniversalData chatUniversalData) {
-        this.messageArea = chatUniversalData.getMessageArea();
+        this.messagePane = chatUniversalData.getMessagePane();
         this.editorArea = chatUniversalData.getEditorArea();
         this.chatUniversalData = chatUniversalData;
     }
@@ -50,7 +49,9 @@ public class ChatFrameListener implements ActionListener {
      * @throws IOException  保存异常
      */
     private void screenshots() throws AWTException, IOException {
-        if (!isChooseRightUser(chatUniversalData)) return;
+        if (isNotChooseRightUser(chatUniversalData)) return;
+        
+        // 开始录音，最多可录制60秒。点击“发送”结束录音。
         Robot robot = new Robot();
         Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
         BufferedImage image = robot.createScreenCapture(rectangle);
@@ -64,7 +65,7 @@ public class ChatFrameListener implements ActionListener {
      * @throws IOException              保存异常
      */
     private void sendAudio() throws LineUnavailableException, IOException {
-        if (!isChooseRightUser(chatUniversalData)) return;
+        if (isNotChooseRightUser(chatUniversalData)) return;
         AudioFormat format = new AudioFormat(8000F, 16, 2, true, false);
         DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
         TargetDataLine targetDataLine = (TargetDataLine) AudioSystem.getLine(info);
@@ -122,7 +123,7 @@ public class ChatFrameListener implements ActionListener {
      * 发送消息
      */
     private void sendText() {
-        if (!isChooseRightUser(chatUniversalData)) return;
+        if (isNotChooseRightUser(chatUniversalData)) return;
         Date date = new Date();
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
         String time = dateFormat.format(date);
@@ -144,7 +145,7 @@ public class ChatFrameListener implements ActionListener {
 
         String userName = chatUniversalData.getUserName();
         String text = userName + " " + time + " -> " + toUserName + "\n" + message + "\n";   //拼接消息
-        messageArea.append(text);    //将消息发送到显示框(本地)
+        messageInsertText(messagePane, text);    //将消息发送到显示框(本地)
 
         try {
             if (Objects.equals(userName, "Server")) {
@@ -161,7 +162,7 @@ public class ChatFrameListener implements ActionListener {
      * 发送文件
      */
     private void sendFile() {
-        if (!isChooseRightUser(chatUniversalData)) return;
+        if (isNotChooseRightUser(chatUniversalData)) return;
 
         JFileChooser fileChooser = new JFileChooser();  //创建文件选择器
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);   //设置只能选择文件
@@ -193,7 +194,7 @@ public class ChatFrameListener implements ActionListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        messageArea.append(userName + " " + time + " -> " + toUserName + "\n已发送文件: " + fileName + "\n");    //将消息发送到显示框(本地)
+        messageInsertText(messagePane,userName + " " + time + " -> " + toUserName + "\n已发送文件: " + fileName + "\n");    //将消息发送到显示框(本地)
     }
 
     /**

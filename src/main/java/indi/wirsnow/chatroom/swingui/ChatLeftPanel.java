@@ -39,15 +39,16 @@ public class ChatLeftPanel {
         messagePanel.requestFocus();    // 获取焦点
         gridBagLayout.rowHeights = new int[]{235, 40, 130, 30}; // 设置最小行高
 
-        JTextArea messageArea = chatUniversalData.getMessageArea();
+        JTextPane messagePane = chatUniversalData.getMessagePane();
         JTextArea editorArea = chatUniversalData.getEditorArea();
-        JScrollPane messageScrollPane = new JScrollPane(messageArea);   // 创建滚动条
+        JScrollPane messageScrollPane = new JScrollPane(messagePane);   // 创建滚动条
         JScrollPane editorScrollPane = new JScrollPane(editorArea);     // 创建滚动条
 
         // 设置聊天记录显示框
         {
-            setAreaDefault(messageArea);    // 设置消息框格式
-            messageArea.setEditable(false); // 设置不可编辑
+            messagePane.setBackground(Color.WHITE);    // 设置聊天记录显示框背景颜色
+            messagePane.setFont(new Font("微软雅黑", Font.PLAIN, 14)); // 设置字体;    // 设置消息框格式
+            messagePane.setEditable(false); // 设置不可编辑
             messageScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // 设置水平滚动条不可见
             addGridBagComponent(messagePanel, gridBagLayout, gridBagConstraints, messageScrollPane, 0, 0, 1, 1, 1, 1); // 添加组件
         }

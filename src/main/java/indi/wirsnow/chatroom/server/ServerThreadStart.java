@@ -9,8 +9,7 @@ import java.net.Socket;
 import java.util.Map;
 import java.util.concurrent.*;
 
-import static indi.wirsnow.chatroom.util.ChatUniversalUtil.appendAndFlush;
-import static indi.wirsnow.chatroom.util.ChatUniversalUtil.flushUserList;
+import static indi.wirsnow.chatroom.util.ChatUniversalUtil.*;
 
 /**
  * @author : wirsnow
@@ -34,14 +33,13 @@ public class ServerThreadStart {
     }
 
     private void connect() {
-        JTextArea messageArea = chatUniversalData.getMessageArea();
         int port = Integer.parseInt(chatUniversalData.getPortField().getText());
         threadPool.execute(() -> {
             // 创建服务器端ServerSocket，指定绑定的端口，并监听此端口
             try (ServerSocket serverSocket = new ServerSocket(port)) {
                 chatUniversalData.setConnected(true);
                 flushUserList(chatUniversalData);       // 刷新用户列表
-                appendAndFlush(messageArea, "服务器启动成功，等待客户端连接...\n");
+                messageInsertText(chatUniversalData.getMessagePane(), "服务器启动成功，等待客户端连接...\n");
                 threadPool.execute(() -> disconnect(serverSocket));
                 // 调用accept()方法开始监听，等待客户端的连接
                 while (chatUniversalData.getConnected()) {
