@@ -141,7 +141,6 @@ public class ChatUniversalUtil {
         ImageIcon icon = new ImageIcon("src/main/resources/icons/" + iconPath);
         // ImageIcon icon = new ImageIcon(ChatUniversalUtil.class.getResource("icons/" + iconPath));
         Image img = icon.getImage();
-
         button.setIcon(new ImageIcon(img));
     }
 

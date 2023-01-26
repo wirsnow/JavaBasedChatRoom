@@ -12,7 +12,7 @@ import java.util.TreeMap;
  */
 public class ChatUniversalData {
     private final JList<String> userList = new JList<>();       // 用户列表
-    private final JTextPane messagePane = new JTextPane();      // 消息区域
+    private final JIMSendTextPane messagePane = new JIMSendTextPane();      // 消息区域
     private final JTextArea editorArea = new JTextArea();       // 编辑区域
     private final JTextField ipField = new JTextField("127.0.0.1");     // IP输入框
     private final JTextField portField = new JTextField("56448");       // port输入框
