@@ -50,12 +50,44 @@ public class ChatFrameListener implements ActionListener {
      */
     private void screenshots() throws AWTException, IOException {
         if (isNotChooseRightUser(chatUniversalData)) return;
-        
-        // 开始录音，最多可录制60秒。点击“发送”结束录音。
+
         Robot robot = new Robot();
         Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
         BufferedImage image = robot.createScreenCapture(rectangle);
-        ImageIO.write(image, "png", new File("src\\main\\resources\\images\\screenshots.png"));
+
+        String userName = chatUniversalData.getUserName();
+        String toUserName = chatUniversalData.getToUserName();
+        String thisPath = System.getProperty("user.dir") + "/" + userName + "/myScreenshots";
+
+        File dir = new File(thisPath);
+        if (!dir.exists() && !dir.isDirectory()) {
+            dir.mkdirs();
+        }
+        // 如果存在先删除
+        Date date = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
+        String time = dateFormat.format(date);
+
+        File screenTemp = new File(thisPath + "/temp_" +date.getTime()+".png");
+        ImageIO.write(image, "png", screenTemp);
+
+        String fileName = "screenshots_" + date.getTime() + ".png";
+        String base64 = fileToBase64(screenTemp);
+
+        if (Objects.equals(base64, "") || base64 == null) base64 = "0";
+        try {
+            if (Objects.equals(userName, "Server")) {
+                serverMessageOutput.sendScreen(chatUniversalData, toUserName, fileName, base64);
+            } else {
+                clientMessageOutput.sendScreen(chatUniversalData, toUserName, fileName, base64);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        messageInsertText(messagePane,userName + " " + time + " -> " + toUserName + "\n");    //将消息发送到显示框(本地)
+        messageInsertImage(messagePane, screenTemp);
+        // 关闭screenTemp
+        screenTemp.delete();
     }
 
     /**

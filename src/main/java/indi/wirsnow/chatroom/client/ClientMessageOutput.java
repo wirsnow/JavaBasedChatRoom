@@ -13,6 +13,16 @@ import java.net.Socket;
  * @description : 客户端发送消息类
  */
 public class ClientMessageOutput {
+    public void sendAudio(ChatUniversalData chatUniversalData, String toUserName, String fileName, String base64) throws IOException {
+        Socket socket = chatUniversalData.getSocket();
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+        writer.println(toUserName + "-to:audi://" + fileName + "-name:" + base64);
+    }
+    public void sendScreen(ChatUniversalData chatUniversalData, String toUserName, String fileName, String base64) throws IOException {
+        Socket socket = chatUniversalData.getSocket();
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+        writer.println(toUserName + "-to:icon://" + fileName + "-name:" + base64);
+    }
 
     public void sendFile(ChatUniversalData chatUniversalData, String toUserName, String fileName, String base64) throws IOException {
         Socket socket = chatUniversalData.getSocket();

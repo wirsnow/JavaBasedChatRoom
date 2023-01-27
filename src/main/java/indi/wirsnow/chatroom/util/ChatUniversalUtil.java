@@ -3,6 +3,8 @@ package indi.wirsnow.chatroom.util;
 import indi.wirsnow.chatroom.swingui.listener.ChatFrameListener;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.io.*;
 import java.util.Base64;
@@ -18,28 +20,35 @@ public class ChatUniversalUtil {
      * 立即刷新界面
      *
      * @param messagePane 消息区域
-     * @param text 消息
+     * @param text        消息
      */
-    public static void messageInsertText(JTextPane messagePane, String text){
+    public static void messageInsertText(JTextPane messagePane, String text) {
         if (text == null) return;
-        messagePane.setText(messagePane.getText()+text);
-        // messagePane.paintImmediately(messagePane.getBounds());
-        messagePane.setCaretPosition(messagePane.getText().length());
+        StyledDocument doc = messagePane.getStyledDocument();
+        try { // 插入文本
+            doc.insertString(doc.getLength(), text, null);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+        // 滚动到底部
+        messagePane.setCaretPosition(doc.getLength());
     }
 
     /**
      * 插入图片，并立即刷新界面
      *
      * @param messagePane 消息区域
-     * @param image 图片
+     * @param file   图片文件
      */
-    public static void messageInsertImage(JTextPane messagePane, ImageIcon image){
-        messagePane.setCaretPosition(messagePane.getDocument().getLength()); // 设置插入位置
-        messagePane.insertIcon(image); // 插入图片
-        messageInsertText(messagePane, "\n"); // 这样做可以换行
+    public static void messageInsertImage(JTextPane messagePane, File file) {
+        messagePane.setCaretPosition(messagePane.getStyledDocument().getLength()); // 设置插入位置
+        messagePane.insertIcon(new ImageIcon(file.getPath())); // 插入图片
+        messageInsertText(messagePane, "\n"); // 换行
     }
+
     /**
      * 验证是否选择了正确的用户
+     *
      * @param chatUniversalData 通用数据
      * @return 是否选择了正确的用户
      */
@@ -86,15 +95,10 @@ public class ChatUniversalUtil {
      * @param fileName 文件名
      * @return 文件路径
      */
-    public static String base64ToFile(ChatUniversalData chatUniversalData, String base64, String fileName) {
+    public static String base64ToFile(ChatUniversalData chatUniversalData, String base64, String fileName, String path) {
         // 获取当前目录
-        String userName = chatUniversalData.getUserName()
-                .replace("\\", "").replace("/", "")
-                .replace(":", "").replace("*", "")
-                .replace("?", "").replace("\"", "")
-                .replace("<", "").replace(">", "")
-                .replace("|", "");  // 防止文件夹名称中包含非法字符
-        String thisPath = System.getProperty("user.dir") + "\\file-" + userName;
+        String userName = chatUniversalData.getUserName();
+        String thisPath = System.getProperty("user.dir") + "\\" + userName + "\\" + path;
         // 如果目录不存在, 创建目录
         File dir = new File(thisPath);
         if (!dir.exists() && !dir.isDirectory()) {

@@ -63,6 +63,11 @@ public class ChatLoginFrame {
             } else if (userName.equals("Server") || userName.equals("Server-MyUserName") || userName.equals("所有人")) {
                 JOptionPane.showMessageDialog(frame, "名称中含有非法字符", "错误", JOptionPane.ERROR_MESSAGE);
             } else {
+                userName = userName.replace("\\", "").replace("/", "")
+                        .replace(":", "").replace("*", "")
+                        .replace("?", "").replace("\"", "")
+                        .replace("<", "").replace(">", "")
+                        .replace("|", "");  // 替换非法字符
                 chatUniversalData.setUserName(userName);
                 frame.dispose();
                 mFrame.setTitle(userName);

@@ -14,6 +14,32 @@ import java.util.Objects;
  * @description : 服务端发送消息类
  */
 public class ServerMessageOutput {
+    public void sendAudio(ChatUniversalData chatUniversalData, String toUserName, String fileName, String base64) throws IOException {
+        if (Objects.equals(toUserName, "所有人")) {
+            for (String userName : chatUniversalData.getAllOnlineUser().keySet()) {
+                Socket socket = chatUniversalData.getAllOnlineUser().get(userName);
+                PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+                writer.println("Server-from:audi://" + fileName + "-name:" + base64);
+            }
+        } else {
+            Socket socket = chatUniversalData.getAllOnlineUser().get(toUserName);
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+            writer.println("Server-from:audi://" + fileName + "-name:" + base64);
+        }
+    }
+    public void sendScreen(ChatUniversalData chatUniversalData, String toUserName, String fileName, String base64) throws IOException {
+        if (Objects.equals(toUserName, "所有人")) {
+            for (String userName : chatUniversalData.getAllOnlineUser().keySet()) {
+                Socket socket = chatUniversalData.getAllOnlineUser().get(userName);
+                PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+                writer.println("Server-from:icon://" + fileName + "-name:" + base64);
+            }
+        } else {
+            Socket socket = chatUniversalData.getAllOnlineUser().get(toUserName);
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+            writer.println("Server-from:icon://" + fileName + "-name:" + base64);
+        }
+    }
     public void sendFile(ChatUniversalData chatUniversalData, String toUserName, String fileName, String base64) throws IOException {
         if (Objects.equals(toUserName, "所有人")) {
             for (String userName : chatUniversalData.getAllOnlineUser().keySet()) {
@@ -26,7 +52,6 @@ public class ServerMessageOutput {
             PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
             writer.println("Server-from:file://" + fileName + "-name:" + base64);
         }
-
     }
 
     public void sendTextMessage(ChatUniversalData chatUniversalData, String toUserName, String message) throws IOException {
