@@ -44,75 +44,6 @@ public class ChatFrameListener implements ActionListener {
     }
 
     /**
-     * 截图
-     *
-     * @throws AWTException 截图异常
-     * @throws IOException  保存异常
-     */
-    private void screenshots() throws AWTException, IOException {
-        if (isNotChooseRightUser(chatUniversalData)) return;
-
-        Robot robot = new Robot();
-        //获取屏幕大小
-        Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()); // width=1549,height=871,小于正常值
-        MultiResolutionImage multiResolutionImage = robot.createMultiResolutionScreenCapture(rectangle);
-        java.util.List<Image> resolutionVariants = multiResolutionImage.getResolutionVariants();
-        BufferedImage image = (BufferedImage) resolutionVariants.get(1);
-
-        String userName = chatUniversalData.getUserName();
-        String toUserName = chatUniversalData.getToUserName();
-        String thisPath = System.getProperty("user.dir") + "/" + userName + "/myScreenshots";
-
-        File dir = new File(thisPath);
-        if (!dir.exists() && !dir.isDirectory()) {
-            dir.mkdirs();
-        }
-        // 如果存在先删除
-        Date date = new Date();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
-        String time = dateFormat.format(date);
-
-        File screenTemp = new File(thisPath + "/temp_" + date.getTime() + ".png");
-        ImageIO.write(image, "png", screenTemp);
-
-        String fileName = "screenshots_" + date.getTime() + ".png";
-        String base64 = fileToBase64(screenTemp);
-
-        if (Objects.equals(base64, "") || base64 == null) base64 = "0";
-        try {
-            if (Objects.equals(userName, "Server")) {
-                serverMessageOutput.sendScreen(chatUniversalData, toUserName, fileName, base64);
-            } else {
-                clientMessageOutput.sendScreen(chatUniversalData, toUserName, fileName, base64);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        messageInsertText(messagePane, userName + " " + time + " -> " + toUserName + "\n");    //将消息发送到显示框(本地)
-        messageInsertImage(messagePane, screenTemp);    //将图片发送到显示框(本地)
-    }
-
-    /**
-     * 发送语音
-     *
-     * @throws LineUnavailableException 语音异常
-     * @throws IOException              保存异常
-     */
-    private void sendAudio() throws LineUnavailableException, IOException {
-        if (isNotChooseRightUser(chatUniversalData)) return;
-        AudioFormat format = new AudioFormat(8000F, 16, 2, true, false);
-        DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
-        TargetDataLine targetDataLine = (TargetDataLine) AudioSystem.getLine(info);
-        targetDataLine.open(format);
-        targetDataLine.start();
-        AudioInputStream audioInputStream = new AudioInputStream(targetDataLine);
-        AudioFileFormat.Type fileType = AudioFileFormat.Type.WAVE;
-        File audioFile = new File("src\\main\\resources\\audio\\audio.wav");
-        AudioSystem.write(audioInputStream, fileType, audioFile);
-        targetDataLine.close();
-    }
-
-    /**
      * @param e the event to be processed
      */
     @Override
@@ -120,20 +51,8 @@ public class ChatFrameListener implements ActionListener {
         String result = e.getActionCommand();
         switch (result) {
             case "send" -> sendText();
-            case "screenshots" -> {
-                try {
-                    screenshots();
-                } catch (AWTException | IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-            case "sendAudio" -> {
-                try {
-                    sendAudio();
-                } catch (LineUnavailableException | IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
+            case "screenshots" -> screenshots();
+            case "sendAudio" -> sendAudio();
             case "sendFile" -> sendFile();
             case "connect" -> {
                 if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
@@ -189,6 +108,145 @@ public class ChatFrameListener implements ActionListener {
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 截图
+     */
+    private void screenshots() {
+        if (isNotChooseRightUser(chatUniversalData)) return;
+
+        Robot robot = null;
+        try {
+            robot = new Robot();
+        } catch (Exception ignored) {
+        }
+        //获取屏幕大小
+        Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+        assert robot != null;
+        MultiResolutionImage multiResolutionImage = robot.createMultiResolutionScreenCapture(rectangle);
+        java.util.List<Image> resolutionVariants = multiResolutionImage.getResolutionVariants();
+        BufferedImage image = (BufferedImage) resolutionVariants.get(1);
+
+        String userName = chatUniversalData.getUserName();
+        String toUserName = chatUniversalData.getToUserName();
+        String thisPath = System.getProperty("user.dir") + "/" + userName + "/myScreenshots";
+
+        File dir = new File(thisPath);
+        if (!dir.exists() && !dir.isDirectory()) {
+            dir.mkdirs();
+        }
+        // 如果存在先删除
+        Date date = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
+        String time = dateFormat.format(date);
+
+        File screenTemp = new File(thisPath + "/temp_" + date.getTime() + ".png");
+        try {
+            ImageIO.write(image, "png", screenTemp);
+        } catch (IOException ignored) {
+        }
+
+        String fileName = "screenshots_" + date.getTime() + ".png";
+        String base64 = fileToBase64(screenTemp);
+
+        if (Objects.equals(base64, "") || base64 == null) base64 = "0";
+        try {
+            if (Objects.equals(userName, "Server")) {
+                serverMessageOutput.sendScreen(chatUniversalData, toUserName, fileName, base64);
+            } else {
+                clientMessageOutput.sendScreen(chatUniversalData, toUserName, fileName, base64);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        messageInsertText(messagePane, userName + " " + time + " -> " + toUserName + "\n");    //将消息发送到显示框(本地)
+        messageInsertImage(messagePane, screenTemp);    //将图片发送到显示框(本地)
+    }
+
+    /**
+     * 发送语音
+     */
+    private void sendAudio() {
+        if (isNotChooseRightUser(chatUniversalData)) return;
+
+        // 提示正在录音并显示录制时长
+        JDialog dialog = new JDialog();
+        dialog.setTitle("录音中");
+        dialog.setSize(300, 150);
+        dialog.setLocationRelativeTo(null);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setLayout(new FlowLayout());
+        JLabel label = new JLabel("正在录音，已录制0秒", JLabel.CENTER);
+        // 停止录音按钮
+        JButton stopButton = new JButton("停止");
+        stopButton.addActionListener(e -> dialog.dispose());
+        dialog.add(label);
+        dialog.add(stopButton);
+        dialog.setVisible(true);
+
+        try {
+            AudioFormat format = new AudioFormat(8000F, 16, 2, true, false);
+            DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
+            TargetDataLine targetDataLine = (TargetDataLine) AudioSystem.getLine(info);
+
+            Date data = new Date();
+            String userName = chatUniversalData.getUserName();
+            String toUserName = chatUniversalData.getToUserName();
+            String filename = "audio_" + data.getTime() + ".wav";
+            String thisPath = System.getProperty("user.dir") + "\\" + userName + "\\audio\\";
+
+            File file = new File(thisPath + filename);
+            // 开启录音线程
+            new Thread(() -> {
+                try {
+                    targetDataLine.open(format);
+                    targetDataLine.start();
+                    // 如果目录不存在, 创建目录
+                    File dir = new File(thisPath);
+                    if (!dir.exists() && !dir.isDirectory()) {
+                        dir.mkdirs();
+                    }
+                    AudioSystem.write(new AudioInputStream(targetDataLine), AudioFileFormat.Type.WAVE, file);
+                } catch (LineUnavailableException | IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            // 动态显示录制时间
+            new Thread(() -> {
+                int time = 0;
+                while (dialog.isVisible()) {
+                    label.setText("正在录音，已录制" + time + "秒");
+                    try {
+                        time++;
+                        Thread.sleep(1000);
+                    } catch (InterruptedException interruptedException) {
+                        interruptedException.printStackTrace();
+                    }
+                    if (time > 180) {
+                        JOptionPane.showMessageDialog(null, "不能录制超过三分钟！", "警告", JOptionPane.INFORMATION_MESSAGE);
+                        dialog.dispose();
+                        break;
+                    }
+                }
+                targetDataLine.stop();
+                targetDataLine.close();
+                String base64 = fileToBase64(file);
+                try {
+                    // 发送语音
+                    if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
+                        serverMessageOutput.sendAudio(chatUniversalData, toUserName, filename, base64);
+                    } else {
+                        clientMessageOutput.sendAudio(chatUniversalData, toUserName, filename, base64);
+                    }
+                    messageInsertText(messagePane, userName + " " + time + " -> " + toUserName + "\n已发送录音: " + filename + "\n");    //将消息发送到显示框(本地)
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        } catch (Exception ignored) {
         }
     }
 

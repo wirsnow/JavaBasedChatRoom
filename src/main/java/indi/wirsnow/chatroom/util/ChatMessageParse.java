@@ -65,7 +65,7 @@ public class ChatMessageParse {
                 if(Objects.equals(base64, "0")){
                     base64 = "0";
                 }
-                String filePath = base64ToFile(chatUniversalData, base64, fileName, "file");
+                String filePath = base64ToFile(chatUniversalData, base64, fileName, "file") + "\\" + fileName;
                 return fromUserName + " " + time + "\n已接收文件: "+ fileName + "\n已保存至: " + filePath + "\n";
             }
             case "icon" ->{
@@ -78,7 +78,10 @@ public class ChatMessageParse {
                 return null;
             }
             case "audi" ->{
-                String filePath = base64ToFile(chatUniversalData, message, fromUserName, "audio");
+                String[] splitResult = fileSplit(message);
+                String fileName = splitResult[0];
+                String base64 = splitResult[1];
+                String filePath = base64ToFile(chatUniversalData, base64, fileName, "audio") + "\\" + fileName;
                 return fromUserName + " " + time + "\n已接收语音: "+ fromUserName + "\n已保存至: " + filePath + "\n";
             }
             case "text" -> {
