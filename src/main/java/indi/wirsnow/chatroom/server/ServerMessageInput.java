@@ -75,6 +75,8 @@ public class ServerMessageInput implements Runnable {
                             out.println("Server-from:list://" + allOnlineUser.toString());
                     case "LogOut" -> {
                         // 如果是退出消息，就将用户从在线用户列表中移除
+                        // 获取value
+                        allOnlineUser.get(targetUser).close();
                         allOnlineUser.remove(targetUser);
                         flushUserList(chatUniversalData);
                         // 通知其他用户有用户下线
@@ -85,6 +87,7 @@ public class ServerMessageInput implements Runnable {
                                 outTemp.println("Server-from:exit://" + targetUser);
                             }
                         }
+
                     }
                     default -> {
                         if (Objects.equals(targetUser, "Server")) {
