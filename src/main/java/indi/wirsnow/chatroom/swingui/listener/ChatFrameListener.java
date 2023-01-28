@@ -174,7 +174,7 @@ public class ChatFrameListener implements ActionListener {
         // 提示正在录音并显示录制时长
         JDialog dialog = new JDialog();
         dialog.setTitle("录音中");
-        dialog.setSize(300, 150);
+        dialog.setSize(250, 100);
         dialog.setLocationRelativeTo(null);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setLayout(new FlowLayout());
@@ -191,10 +191,12 @@ public class ChatFrameListener implements ActionListener {
             DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
             TargetDataLine targetDataLine = (TargetDataLine) AudioSystem.getLine(info);
 
-            Date data = new Date();
+            Date date = new Date();
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
+            String time = dateFormat.format(date);
             String userName = chatUniversalData.getUserName();
             String toUserName = chatUniversalData.getToUserName();
-            String filename = "audio_" + data.getTime() + ".wav";
+            String filename = "audio_" + date.getTime() + ".wav";
             String thisPath = System.getProperty("user.dir") + "\\" + userName + "\\audio\\";
 
             File file = new File(thisPath + filename);
@@ -216,16 +218,16 @@ public class ChatFrameListener implements ActionListener {
 
             // 动态显示录制时间
             new Thread(() -> {
-                int time = 0;
+                int audioTime = 0;
                 while (dialog.isVisible()) {
-                    label.setText("正在录音，已录制" + time + "秒");
+                    label.setText("正在录音，已录制" + audioTime + "秒");
                     try {
-                        time++;
+                        audioTime++;
                         Thread.sleep(1000);
                     } catch (InterruptedException interruptedException) {
                         interruptedException.printStackTrace();
                     }
-                    if (time > 180) {
+                    if (audioTime > 180) {
                         JOptionPane.showMessageDialog(null, "不能录制超过三分钟！", "警告", JOptionPane.INFORMATION_MESSAGE);
                         dialog.dispose();
                         break;

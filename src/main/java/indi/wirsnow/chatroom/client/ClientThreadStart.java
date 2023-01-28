@@ -54,6 +54,13 @@ public class ClientThreadStart {
             }
         });
     }
+
+
+    /**
+     * 准备断开与服务器的连接
+     *
+     * @param socket socket
+     */
     private void disconnect(Socket socket) {
         while (chatUniversalData.getConnected()) {
             try {

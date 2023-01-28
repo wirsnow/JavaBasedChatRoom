@@ -1,11 +1,14 @@
 package indi.wirsnow.chatroom.swingui;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
+import indi.wirsnow.chatroom.client.ClientMessageOutput;
 import indi.wirsnow.chatroom.swingui.listener.ChatFrameListener;
 import indi.wirsnow.chatroom.util.ChatUniversalData;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Objects;
 
 /**
@@ -64,7 +67,20 @@ public class ChatFrame {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 设置窗口关闭方式
         frame.setMinimumSize(new Dimension(500, 500)); // 设置窗口最小大小
         frame.setLocationRelativeTo(null);  // 设置窗口居中
-
+        frame.addWindowListener(
+                new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        if(!Objects.equals(chatUniversalData.getUserName(), "Server")) {
+                            super.windowClosing(e);
+                            try {
+                                ClientMessageOutput clientMessageOutput = new ClientMessageOutput();
+                                clientMessageOutput.sendDisconnectMessage(chatUniversalData);
+                            }catch (Exception ignored) {}
+                        }
+                    }
+                }
+        );
         // 左侧聊天面板
         ChatLeftPanel chatLeftPanel = new ChatLeftPanel(frame, listener, chatUniversalData);
         chatLeftPanel.createLeftPanel();

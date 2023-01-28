@@ -58,6 +58,7 @@ public class ServerMessageInput implements Runnable {
                     allOnlineUser.put(result, socket);
                     flushUserList(chatUniversalData);
                     userName = result;
+                    System.out.println("用户" + userName + "上线了");
                     out.println("Server-from:list://" + allOnlineUser.keySet());
 
                     for (Map.Entry<String, Socket> entry : allOnlineUser.entrySet()) {
