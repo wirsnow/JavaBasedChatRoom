@@ -54,7 +54,7 @@ public class ServerMessageOutput {
         }
     }
 
-    public void sendTextMessage(ChatUniversalData chatUniversalData, String toUserName, String message) throws IOException {
+    public void sendText(ChatUniversalData chatUniversalData, String toUserName, String message) throws IOException {
         if (Objects.equals(toUserName, "所有人")) {
             for (String userName : chatUniversalData.getAllOnlineUser().keySet()) {
                 Socket socket = chatUniversalData.getAllOnlineUser().get(userName);

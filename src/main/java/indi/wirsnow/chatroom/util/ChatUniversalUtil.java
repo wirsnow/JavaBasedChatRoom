@@ -38,12 +38,24 @@ public class ChatUniversalUtil {
      * 插入图片，并立即刷新界面
      *
      * @param messagePane 消息区域
-     * @param file   图片文件
+     * @param file        图片文件
      */
     public static void messageInsertImage(JTextPane messagePane, File file) {
-        messagePane.setCaretPosition(messagePane.getStyledDocument().getLength()); // 设置插入位置
-        messagePane.insertIcon(new ImageIcon(file.getPath())); // 插入图片
-        messageInsertText(messagePane, "\n"); // 换行
+        if (file == null) return;
+        ImageIcon imageIcon = new ImageIcon(file.getPath());
+        // 获取messagePane的界面大小
+        Dimension size = messagePane.getSize();
+        int width = imageIcon.getIconWidth();
+        // 如果图片的宽度大于messagePane的宽度, 则将图片的宽度设置为messagePane的宽度
+        if (width > size.width) {
+            imageIcon.setImage(imageIcon.getImage().getScaledInstance((int) (size.width * 0.8), -1, Image.SCALE_DEFAULT));
+        }
+        // 设置插入位置
+        messagePane.setCaretPosition(messagePane.getStyledDocument().getLength());
+        // 插入图片
+        messagePane.insertIcon(imageIcon);
+        // 换行
+        messageInsertText(messagePane, "\n");
     }
 
     /**

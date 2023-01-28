@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.awt.image.MultiResolutionImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -52,8 +53,11 @@ public class ChatFrameListener implements ActionListener {
         if (isNotChooseRightUser(chatUniversalData)) return;
 
         Robot robot = new Robot();
-        Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-        BufferedImage image = robot.createScreenCapture(rectangle);
+        //获取屏幕大小
+        Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()); // width=1549,height=871,小于正常值
+        MultiResolutionImage multiResolutionImage = robot.createMultiResolutionScreenCapture(rectangle);
+        java.util.List<Image> resolutionVariants = multiResolutionImage.getResolutionVariants();
+        BufferedImage image = (BufferedImage) resolutionVariants.get(1);
 
         String userName = chatUniversalData.getUserName();
         String toUserName = chatUniversalData.getToUserName();
@@ -68,7 +72,7 @@ public class ChatFrameListener implements ActionListener {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");    //设置日期格式
         String time = dateFormat.format(date);
 
-        File screenTemp = new File(thisPath + "/temp_" +date.getTime()+".png");
+        File screenTemp = new File(thisPath + "/temp_" + date.getTime() + ".png");
         ImageIO.write(image, "png", screenTemp);
 
         String fileName = "screenshots_" + date.getTime() + ".png";
@@ -84,10 +88,8 @@ public class ChatFrameListener implements ActionListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        messageInsertText(messagePane,userName + " " + time + " -> " + toUserName + "\n");    //将消息发送到显示框(本地)
-        messageInsertImage(messagePane, screenTemp);
-        // 关闭screenTemp
-        screenTemp.delete();
+        messageInsertText(messagePane, userName + " " + time + " -> " + toUserName + "\n");    //将消息发送到显示框(本地)
+        messageInsertImage(messagePane, screenTemp);    //将图片发送到显示框(本地)
     }
 
     /**
@@ -181,9 +183,9 @@ public class ChatFrameListener implements ActionListener {
 
         try {
             if (Objects.equals(userName, "Server")) {
-                serverMessageOutput.sendTextMessage(chatUniversalData, toUserName, message);
+                serverMessageOutput.sendText(chatUniversalData, toUserName, message);
             } else {
-                clientMessageOutput.sendTextMessage(chatUniversalData, toUserName, message);
+                clientMessageOutput.sendText(chatUniversalData, toUserName, message);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -226,7 +228,7 @@ public class ChatFrameListener implements ActionListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        messageInsertText(messagePane,userName + " " + time + " -> " + toUserName + "\n已发送文件: " + fileName + "\n");    //将消息发送到显示框(本地)
+        messageInsertText(messagePane, userName + " " + time + " -> " + toUserName + "\n已发送文件: " + fileName + "\n");    //将消息发送到显示框(本地)
     }
 
     /**

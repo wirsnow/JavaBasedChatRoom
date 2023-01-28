@@ -35,7 +35,7 @@ public class ClientMessageOutput {
         out.println(chatUniversalData.getUserName() + "-to:LogOut");
     }
 
-    public void sendTextMessage(ChatUniversalData chatUniversalData, String toUserName, String message) throws IOException {
+    public void sendText(ChatUniversalData chatUniversalData, String toUserName, String message) throws IOException {
         PrintWriter writer = new PrintWriter(new OutputStreamWriter(chatUniversalData.getSocket().getOutputStream()), true);
         String[] strs = message.split("\n");
         if (strs.length <= 1) {
