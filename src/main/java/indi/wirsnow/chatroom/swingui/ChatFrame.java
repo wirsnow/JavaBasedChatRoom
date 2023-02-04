@@ -2,6 +2,7 @@ package indi.wirsnow.chatroom.swingui;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import indi.wirsnow.chatroom.client.ClientMessageOutput;
+import indi.wirsnow.chatroom.server.ServerMessageOutput;
 import indi.wirsnow.chatroom.swingui.listener.ChatFrameListener;
 import indi.wirsnow.chatroom.util.ChatUniversalData;
 
@@ -71,7 +72,14 @@ public class ChatFrame {
                 new WindowAdapter() {
                     @Override
                     public void windowClosing(WindowEvent e) {
-                        if(!Objects.equals(chatUniversalData.getUserName(), "Server")) {
+                        if(Objects.equals(chatUniversalData.getUserName(), "Server")){
+                            super.windowClosing(e);
+                            try {
+                                ServerMessageOutput serverMessageOutput = new ServerMessageOutput();
+                                serverMessageOutput.sendDisconnectMessage(chatUniversalData);
+                            }catch (Exception ignored) {}
+                        }
+                        else {
                             super.windowClosing(e);
                             try {
                                 ClientMessageOutput clientMessageOutput = new ClientMessageOutput();

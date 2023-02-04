@@ -49,7 +49,7 @@ public class ClientThreadStart {
                 // 运行ClientMessageInput
                 new ClientMessageInput(socket, chatUniversalData);
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "连接失败\n" + e, "错误", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "连接失败\n请检查服务器状态", "错误", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
             }
         });

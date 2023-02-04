@@ -1,10 +1,15 @@
 package indi.wirsnow.chatroom.util;
 
+import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
 
 import static indi.wirsnow.chatroom.util.ChatUniversalUtil.*;
 
@@ -40,6 +45,16 @@ public class ChatMessageParse {
             }
             case "exit" -> {
                 if (Objects.equals(fromUserName, "Server")) {
+                    if (message.equals("Server")) {
+                        chatUniversalData.getUserList().setModel(new DefaultListModel<>());
+                        chatUniversalData.getUserField().setText("当前在线: 0");
+                        try {
+                            chatUniversalData.getSocket().close();
+                        } catch (IOException ignored) {
+                        }
+                        chatUniversalData.setConnected(false);
+                        return null;
+                    }
                     chatUniversalData.getAllOnlineUser().remove(message);
                     flushUserList(chatUniversalData);
                     return null;
@@ -58,17 +73,17 @@ public class ChatMessageParse {
                     return null;
                 }
             }
-            case "file" ->{
+            case "file" -> {
                 String[] splitResult = fileSplit(message);
                 String fileName = splitResult[0];
                 String base64 = splitResult[1];
-                if(Objects.equals(base64, "0")){
+                if (Objects.equals(base64, "0")) {
                     base64 = "0";
                 }
                 String filePath = base64ToFile(chatUniversalData, base64, fileName, "file") + "\\" + fileName;
-                return fromUserName + " " + time + "\n已接收文件: "+ fileName + "\n已保存至: " + filePath + "\n";
+                return fromUserName + " " + time + "\n已接收文件: " + fileName + "\n已保存至: " + filePath + "\n";
             }
-            case "icon" ->{
+            case "icon" -> {
                 String[] splitResult = fileSplit(message);
                 String fileName = splitResult[0];
                 String base64 = splitResult[1];
@@ -77,12 +92,12 @@ public class ChatMessageParse {
                 messageInsertImage(chatUniversalData.getMessagePane(), new File(filePath));
                 return null;
             }
-            case "audi" ->{
+            case "audi" -> {
                 String[] splitResult = fileSplit(message);
                 String fileName = splitResult[0];
                 String base64 = splitResult[1];
                 String filePath = base64ToFile(chatUniversalData, base64, fileName, "audio") + "\\" + fileName;
-                return fromUserName + " " + time + "\n已接收语音: "+ fromUserName + "\n已保存至: " + filePath + "\n";
+                return fromUserName + " " + time + "\n已接收语音: " + fromUserName + "\n已保存至: " + filePath + "\n";
             }
             case "text" -> {
                 return fromUserName + " " + time + "\n" + message + "\n";
@@ -106,15 +121,15 @@ public class ChatMessageParse {
         return null;
     }
 
-    private static String[] fileSplit(String message){
+    private static String[] fileSplit(String message) {
         String[] tempArray = message.split("-name:");    // 消息格式：发送者-from:消息类型://消息内容
         String fileName = tempArray[0];
         StringBuilder tempContent = new StringBuilder();
-        if(tempArray.length > 2){
+        if (tempArray.length > 2) {
             for (int i = 1; i < tempArray.length; i++) {
                 tempContent.append(tempArray[i]);
             }
-        }else if (tempArray.length == 2) {
+        } else if (tempArray.length == 2) {
             tempContent.append(tempArray[1]);
         }
         return new String[]{fileName, tempContent.toString()};

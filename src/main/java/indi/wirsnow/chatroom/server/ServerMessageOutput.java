@@ -68,6 +68,14 @@ public class ServerMessageOutput {
         }
     }
 
+    public void sendDisconnectMessage(ChatUniversalData chatUniversalData) throws IOException {
+        for (String name : chatUniversalData.getAllOnlineUser().keySet()) {
+            Socket socket = chatUniversalData.getAllOnlineUser().get(name);
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+            writer.println("Server-from:exit://Server");
+        }
+    }
+
     private void messageModify(PrintWriter writer, String message) {
         String[] strs = message.split("\n");
         if (strs.length <= 1) {
@@ -83,5 +91,7 @@ public class ServerMessageOutput {
             }
         }
     }
+
+
 }
 

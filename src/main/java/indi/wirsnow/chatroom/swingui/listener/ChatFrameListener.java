@@ -173,6 +173,7 @@ public class ChatFrameListener implements ActionListener {
 
         // 提示正在录音并显示录制时长
         JDialog dialog = new JDialog();
+        dialog.setAlwaysOnTop(true);
         dialog.setTitle("录音中");
         dialog.setSize(250, 100);
         dialog.setLocationRelativeTo(null);
@@ -211,13 +212,17 @@ public class ChatFrameListener implements ActionListener {
                         dir.mkdirs();
                     }
                     AudioSystem.write(new AudioInputStream(targetDataLine), AudioFileFormat.Type.WAVE, file);
-                } catch (LineUnavailableException | IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
+                } catch (LineUnavailableException e) {
+                    JOptionPane.showMessageDialog(null, "请检查音频输入设备/录音权限是否开启", "错误", JOptionPane.ERROR_MESSAGE);
+                    dialog.setVisible(false);
                 }
             }).start();
 
-            // 动态显示录制时间
+
             new Thread(() -> {
+                // 动态显示录制时间
                 int audioTime = 0;
                 while (dialog.isVisible()) {
                     label.setText("正在录音，已录制" + audioTime + "秒");
@@ -323,6 +328,9 @@ public class ChatFrameListener implements ActionListener {
             chatUniversalData.setConnected(false);
             chatUniversalData.getUserList().setModel(new DefaultListModel<>());
             chatUniversalData.getUserField().setText("当前在线: 0");
+            try {
+                serverMessageOutput.sendDisconnectMessage(chatUniversalData);
+            } catch (IOException ignored) {}
         }
     }
 
@@ -338,8 +346,7 @@ public class ChatFrameListener implements ActionListener {
             chatUniversalData.getUserField().setText("当前在线: 0");
             try {
                 clientMessageOutput.sendDisconnectMessage(chatUniversalData);
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
         }
 
     }
