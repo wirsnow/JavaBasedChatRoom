@@ -65,7 +65,7 @@ public class ChatLoginFrame {
         loginButton.addActionListener(e -> {
             String userName;
             userName = userNameField.getText();
-            if (userName.equals("")) {
+            if (userName.equals("") || userName.equals("请输入用户名")) {
                 JOptionPane.showMessageDialog(frame, "用户名不能为空", "错误", JOptionPane.ERROR_MESSAGE);
             } else if (userName.contains(" ")) {
                 JOptionPane.showMessageDialog(frame, "用户名不能包含空格", "错误", JOptionPane.ERROR_MESSAGE);
