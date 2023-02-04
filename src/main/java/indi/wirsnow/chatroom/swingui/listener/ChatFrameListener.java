@@ -373,6 +373,7 @@ public class ChatFrameListener implements ActionListener {
             chatUniversalData.setConnected(false);
             chatUniversalData.getUserList().setModel(new DefaultListModel<>());
             chatUniversalData.getUserField().setText("当前在线: 0");
+            chatUniversalData.setToUserName(null);
             try {
                 serverMessageOutput.sendDisconnectMessage(chatUniversalData);
             } catch (IOException ignored) {
@@ -391,6 +392,7 @@ public class ChatFrameListener implements ActionListener {
             chatUniversalData.setConnected(false);
             chatUniversalData.getUserList().setModel(new DefaultListModel<>());
             chatUniversalData.getUserField().setText("当前在线: 0");
+            chatUniversalData.setToUserName(null);
             try {
                 clientMessageOutput.sendDisconnectMessage(chatUniversalData);
             } catch (IOException ignored) {
