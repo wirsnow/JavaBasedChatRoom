@@ -84,7 +84,11 @@ public class ChatLeftPanel {
 
         // 设置文字输入框
         {
-            setAreaDefault(editorArea);    // 设置输入框格式
+            editorArea.setTabSize(4);     // 设置tab键的长度
+            editorArea.setLineWrap(true); // 设置自动换行
+            editorArea.setWrapStyleWord(true);    // 设置断行不断字
+            editorArea.setBackground(Color.WHITE);    // 设置聊天记录显示框背景颜色
+            editorArea.setFont(new Font("微软雅黑", Font.PLAIN, 14)); // 设置字体
             editorScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // 设置水平滚动条不可见
         }
 

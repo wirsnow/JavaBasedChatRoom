@@ -176,19 +176,6 @@ public class ChatUniversalUtil {
     }
 
     /**
-     * 设置文本框的默认格式
-     *
-     * @param area 文本框
-     */
-    public static void setAreaDefault(JTextArea area) {
-        area.setTabSize(4);     // 设置tab键的长度
-        area.setLineWrap(true); // 设置自动换行
-        area.setWrapStyleWord(true);    // 设置断行不断字
-        area.setBackground(Color.WHITE);    // 设置聊天记录显示框背景颜色
-        area.setFont(new Font("微软雅黑", Font.PLAIN, 14)); // 设置字体
-    }
-
-    /**
      * 添加组件
      *
      * @param jPanel             面板

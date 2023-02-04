@@ -82,36 +82,31 @@ public class ServerMessageInput implements Runnable {
                     }
                     continue;
                 }
-                switch (result) {
-                    case "GetUserList" -> out.println("Server-from:list://" + allOnlineUser.toString());
-                    case "LogOut" -> {
-                        // 如果是退出消息，就将用户从在线用户列表中移除并刷新用户列表
-                        allOnlineUser.get(targetUser).close();
-                        allOnlineUser.remove(targetUser);
-                        flushUserList(chatUniversalData);
-                        // 通知其他用户有用户下线
-                        for (Map.Entry<String, Socket> entry : allOnlineUser.entrySet()) {
-                            if (entry.getValue() != null) {
-                                Socket targetSocket = entry.getValue();
-                                PrintWriter outTemp = new PrintWriter((new OutputStreamWriter(targetSocket.getOutputStream())), true);
-                                outTemp.println("Server-from:exit://" + targetUser);
-                            }
-                        }
-
-                    }
-                    default -> {
-                        // 如果目标用户为Server，则正常接收，否则转发消息
-                        if (Objects.equals(targetUser, "Server")) {
-                            // 解析并插入消息到消息面板
-                            message = userName + "-from:" + result;
-                            result = parseMessage(chatUniversalData, message);
-                            messageInsertText(chatUniversalData.getMessagePane(), result);
-                        } else {
-                            // 获取目标用户的socket并转发消息
-                            Socket targetSocket = allOnlineUser.get(targetUser);
+                if (result.equals("LogOut")) {
+                    // 如果是退出消息，就将用户从在线用户列表中移除并刷新用户列表
+                    allOnlineUser.get(targetUser).close();
+                    allOnlineUser.remove(targetUser);
+                    flushUserList(chatUniversalData);
+                    // 通知其他用户有用户下线
+                    for (Map.Entry<String, Socket> entry : allOnlineUser.entrySet()) {
+                        if (entry.getValue() != null) {
+                            Socket targetSocket = entry.getValue();
                             PrintWriter outTemp = new PrintWriter((new OutputStreamWriter(targetSocket.getOutputStream())), true);
-                            outTemp.println(userName + "-from:" + result);
+                            outTemp.println("Server-from:exit://" + targetUser);
                         }
+                    }
+                } else {
+                    // 如果目标用户为Server，则正常接收，否则转发消息
+                    if (Objects.equals(targetUser, "Server")) {
+                        // 解析并插入消息到消息面板
+                        message = userName + "-from:" + result;
+                        result = parseMessage(chatUniversalData, message);
+                        messageInsertText(chatUniversalData.getMessagePane(), result);
+                    } else {
+                        // 获取目标用户的socket并转发消息
+                        Socket targetSocket = allOnlineUser.get(targetUser);
+                        PrintWriter outTemp = new PrintWriter((new OutputStreamWriter(targetSocket.getOutputStream())), true);
+                        outTemp.println(userName + "-from:" + result);
                     }
                 }
             }

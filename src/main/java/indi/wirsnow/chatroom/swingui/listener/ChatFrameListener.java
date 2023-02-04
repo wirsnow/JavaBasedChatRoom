@@ -224,7 +224,7 @@ public class ChatFrameListener implements ActionListener {
             String userName = chatUniversalData.getUserName();
             String toUserName = chatUniversalData.getToUserName();
             String filename = "audio_" + date.getTime() + ".wav";
-            String thisPath = System.getProperty("user.dir") + "\\" + userName + "\\audio\\";
+            String thisPath = System.getProperty("user.dir") + "\\" + userName + "\\myAudio\\";
 
             // 如果文件夹不存在，创建
             File file = new File(thisPath + filename);
