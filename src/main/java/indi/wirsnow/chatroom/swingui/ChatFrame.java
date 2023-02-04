@@ -24,8 +24,7 @@ public class ChatFrame {
         FlatIntelliJLaf.setup();
     }
 
-    private final ChatFrameListener listener; // 监听器
-    private final ChatUniversalData chatUniversalData;    // 数据
+    private final ChatUniversalData chatUniversalData;
 
     /**
      * 构造方法
@@ -33,17 +32,17 @@ public class ChatFrame {
      * @param signal            服务端/客户按标志
      *                          Server: 服务端
      *                          Client: 客户端
-     * @param listener          监听器
-     * @param chatUniversalData 通用数据
+     * @param chatUniversalData 数据类
      */
-    public ChatFrame(String signal, ChatFrameListener listener, ChatUniversalData chatUniversalData) {
-        this.listener = listener;
+    public ChatFrame(String signal, ChatUniversalData chatUniversalData) {
         this.chatUniversalData = chatUniversalData;
         judgeCS(signal);
     }
 
     /**
      * 判断是服务端还是客户端
+     *
+     * @param signal 服务端/客户端标志
      */
     private void judgeCS(String signal) {
         if (Objects.equals(signal, "Client")) {
@@ -63,32 +62,39 @@ public class ChatFrame {
     private void createFrame() {
 
         // 窗体整体设置
-        frame.setResizable(true);  // 设置窗口可改变大小
-        frame.setSize(800, 600);    // 设置窗口大小
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 设置窗口关闭方式
-        frame.setMinimumSize(new Dimension(500, 500)); // 设置窗口最小大小
-        frame.setLocationRelativeTo(null);  // 设置窗口居中
+        frame.setResizable(true);   // 设置窗口可调整大小
+        frame.setSize(800, 600);    // 设置首选大小
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);       // 设置关闭方式
+        frame.setMinimumSize(new Dimension(500, 500)); // 设置最小大小
+        frame.setLocationRelativeTo(null);      // 设置窗口居中
         frame.addWindowListener(
                 new WindowAdapter() {
+                    // 重写窗口关闭事件
                     @Override
                     public void windowClosing(WindowEvent e) {
-                        if(Objects.equals(chatUniversalData.getUserName(), "Server")){
+                        if (Objects.equals(chatUniversalData.getUserName(), "Server")) {
                             super.windowClosing(e);
                             try {
+                                // 发送断开连接消息
                                 ServerMessageOutput serverMessageOutput = new ServerMessageOutput();
                                 serverMessageOutput.sendDisconnectMessage(chatUniversalData);
-                            }catch (Exception ignored) {}
-                        }
-                        else {
+                            } catch (Exception ignored) {
+                            }
+                        } else {
                             super.windowClosing(e);
                             try {
+                                // 发送断开连接消息
                                 ClientMessageOutput clientMessageOutput = new ClientMessageOutput();
                                 clientMessageOutput.sendDisconnectMessage(chatUniversalData);
-                            }catch (Exception ignored) {}
+                            } catch (Exception ignored) {
+                            }
                         }
                     }
                 }
         );
+
+        // 创建监听器
+        ChatFrameListener listener = new ChatFrameListener(chatUniversalData);
         // 左侧聊天面板
         ChatLeftPanel chatLeftPanel = new ChatLeftPanel(frame, listener, chatUniversalData);
         chatLeftPanel.createLeftPanel();

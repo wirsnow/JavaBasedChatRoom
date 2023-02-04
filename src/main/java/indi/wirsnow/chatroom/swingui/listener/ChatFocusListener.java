@@ -14,26 +14,42 @@ public class ChatFocusListener implements FocusListener {
     private final String string;
     private final JTextField textField;
 
+    /**
+     * 构造方法
+     *
+     * @param textField 文本框
+     * @param string    提示文字
+     */
     public ChatFocusListener(JTextField textField, String string) {
         this.textField = textField;
         this.string = string;
     }
 
+    /**
+     * 重写焦点获取事件
+     *
+     * @param e 事件
+     */
     @Override
     public void focusGained(FocusEvent e) {
-        //获取焦点时，清空文本框
+        // 获取焦点时，清空文本框并设置用户输入的字体颜色为黑色
         if (textField.getText().equals(string)) {
-            textField.setText("");     //将提示文字清空
-            textField.setForeground(Color.black);  //设置用户输入的字体颜色为黑色
+            textField.setText("");
+            textField.setForeground(Color.black);
         }
     }
 
+    /**
+     * 重写焦点失去事件
+     *
+     * @param e 事件
+     */
     @Override
     public void focusLost(FocusEvent e) {
-        //失去焦点时，判断文本框内容是否为空，为空则显示提示文字
+        // 失去焦点时，判断文本框内容是否为空，为空则显示提示文字并设置字体颜色为灰色
         if (textField.getText().equals("")) {
-            textField.setForeground(Color.gray); //将提示文字设置为灰色
-            textField.setText(string);     //显示提示文字
+            textField.setForeground(Color.gray);
+            textField.setText(string);
         }
     }
 }

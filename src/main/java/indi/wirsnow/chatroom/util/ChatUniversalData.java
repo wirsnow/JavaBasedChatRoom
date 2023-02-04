@@ -12,8 +12,8 @@ import java.util.TreeMap;
  */
 public class ChatUniversalData {
     private final JList<String> userList = new JList<>();       // 用户列表
-    private final JIMSendTextPane messagePane = new JIMSendTextPane();      // 消息区域
     private final JTextArea editorArea = new JTextArea();       // 编辑区域
+    private final JIMSendTextPane messagePane = new JIMSendTextPane();      // 消息区域
     private final JTextField ipField = new JTextField("127.0.0.1");     // IP输入框
     private final JTextField portField = new JTextField("56448");       // port输入框
     private final JTextField userField = new JTextField("当前在线: 0"); // 在线人数
@@ -21,7 +21,7 @@ public class ChatUniversalData {
     private String userName = null;     // 用户名
     private String toUserName = null;   // 要发送的用户名
     private boolean Connected = false;  // 是否已连接
-    private Map<String, Socket> allOnlineUser = new TreeMap<>();
+    private Map<String, Socket> allOnlineUser = new TreeMap<>();    // 所有在线用户
 
     public Socket getSocket() {
         return socket;

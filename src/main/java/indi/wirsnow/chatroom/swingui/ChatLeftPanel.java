@@ -20,10 +20,17 @@ public class ChatLeftPanel {
     private final JButton sendAudioButton = new JButton();       // 语音按钮
     private final JButton sendFileButton = new JButton();        // 文件按钮
     private final JButton screenshotsButton = new JButton();     // 截图按钮
-    private final JFrame frame;             // 父窗口
-    private final ChatFrameListener listener; // 监听器
-    private final ChatUniversalData chatUniversalData;
+    private final JFrame frame;                 // 父窗口
+    private final ChatFrameListener listener;   // 监听器
+    private final ChatUniversalData chatUniversalData;  // 数据类
 
+    /**
+     * 构造方法
+     *
+     * @param frame             父窗口
+     * @param listener          监听器
+     * @param chatUniversalData 数据类
+     */
     public ChatLeftPanel(JFrame frame, ChatFrameListener listener, ChatUniversalData chatUniversalData) {
         this.frame = frame;
         this.listener = listener;
@@ -32,25 +39,24 @@ public class ChatLeftPanel {
 
     public void createLeftPanel() {
         // 左侧聊天面板
-        GridBagLayout gridBagLayout = new GridBagLayout();                  // 创建网格布局
+        GridBagLayout gridBagLayout = new GridBagLayout();  // 创建网格布局
         GridBagConstraints gridBagConstraints = new GridBagConstraints();   // 创建网格约束
-        messagePanel.setLayout(gridBagLayout);              // 设置布局
-        messagePanel.setBorder(BorderFactory.createTitledBorder("聊天记录"));  // 设置边框
+        messagePanel.setLayout(gridBagLayout);  // 设置布局
+        messagePanel.setBorder(BorderFactory.createTitledBorder("聊天记录"));   // 设置边框
         messagePanel.requestFocus();    // 获取焦点
         gridBagLayout.rowHeights = new int[]{235, 40, 130, 30}; // 设置最小行高
 
-        JTextPane messagePane = chatUniversalData.getMessagePane();
-        JTextArea editorArea = chatUniversalData.getEditorArea();
+        JTextPane messagePane = chatUniversalData.getMessagePane();     // 获取聊天记录显示框
+        JTextArea editorArea = chatUniversalData.getEditorArea();       // 获取消息编辑框
         JScrollPane messageScrollPane = new JScrollPane(messagePane);   // 创建滚动条
         JScrollPane editorScrollPane = new JScrollPane(editorArea);     // 创建滚动条
 
         // 设置聊天记录显示框
         {
             messagePane.setBackground(Color.WHITE);    // 设置聊天记录显示框背景颜色
-            messagePane.setFont(new Font("微软雅黑", Font.PLAIN, 14)); // 设置字体;    // 设置消息框格式
+            messagePane.setFont(new Font("微软雅黑", Font.PLAIN, 14)); // 设置字体
             messagePane.setEditable(false); // 设置不可编辑
             messageScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // 设置水平滚动条不可见
-            addGridBagComponent(messagePanel, gridBagLayout, gridBagConstraints, messageScrollPane, 0, 0, 1, 1, 1, 1); // 添加组件
         }
 
         // 添加工具栏
@@ -74,15 +80,12 @@ public class ChatLeftPanel {
             toolBar.setFloatable(false);
             toolBar.setMaximumSize(new Dimension(200, 40));
             toolBar.setMinimumSize(new Dimension(200, 40));
-
-            addGridBagComponent(messagePanel, gridBagLayout, gridBagConstraints, toolBar, 0, 1, 1, 1, 1, 0); // 添加组件
         }
 
         // 设置文字输入框
         {
             setAreaDefault(editorArea);    // 设置输入框格式
             editorScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // 设置水平滚动条不可见
-            addGridBagComponent(messagePanel, gridBagLayout, gridBagConstraints, editorScrollPane, 0, 2, 1, 1, 1, 0); // 添加组件
         }
 
         //设置发送按钮
@@ -90,11 +93,19 @@ public class ChatLeftPanel {
             sendButton.setMinimumSize(new Dimension(100, 25)); // 设置按钮最小大小
             sendButton.addActionListener(listener); // 添加监听器
             sendButton.setActionCommand("send"); // 设置按钮命令
-            addGridBagComponent(messagePanel, gridBagLayout, gridBagConstraints, sendButton, 0, 3, 1, 1, 1, 0); // 添加组件
         }
 
-        frame.add(messagePanel, BorderLayout.CENTER);    // 添加聊天面板
+        // 添加组件
+        {
+            // 聊天记录显示框
+            addGridBagComponent(messagePanel, gridBagLayout, gridBagConstraints, messageScrollPane, 0, 0, 1, 1, 1, 1);
+            // 工具栏
+            addGridBagComponent(messagePanel, gridBagLayout, gridBagConstraints, toolBar, 0, 1, 1, 1, 1, 0);
+            // 文字输入框
+            addGridBagComponent(messagePanel, gridBagLayout, gridBagConstraints, editorScrollPane, 0, 2, 1, 1, 1, 0);
+            // 发送按钮
+            addGridBagComponent(messagePanel, gridBagLayout, gridBagConstraints, sendButton, 0, 3, 1, 1, 1, 0);
+        }
+        frame.add(messagePanel, BorderLayout.CENTER);    // 添加聊天面板到父窗口
     }
-
-
 }

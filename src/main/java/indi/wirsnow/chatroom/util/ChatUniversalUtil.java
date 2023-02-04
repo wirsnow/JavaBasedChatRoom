@@ -25,10 +25,11 @@ public class ChatUniversalUtil {
     public static void messageInsertText(JTextPane messagePane, String text) {
         if (text == null) return;
         StyledDocument doc = messagePane.getStyledDocument();
-        try { // 插入文本
+        // 插入消息
+        try {
             doc.insertString(doc.getLength(), text, null);
         } catch (BadLocationException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         // 滚动到底部
         messagePane.setCaretPosition(doc.getLength());
@@ -50,9 +51,8 @@ public class ChatUniversalUtil {
         if (width > size.width) {
             imageIcon.setImage(imageIcon.getImage().getScaledInstance((int) (size.width * 0.8), -1, Image.SCALE_DEFAULT));
         }
-        // 设置插入位置
+        // 设置插入位置,插入图片
         messagePane.setCaretPosition(messagePane.getStyledDocument().getLength());
-        // 插入图片
         messagePane.insertIcon(imageIcon);
         // 换行
         messageInsertText(messagePane, "\n");
@@ -95,7 +95,7 @@ public class ChatUniversalUtil {
                 return Base64.getEncoder().encodeToString(bytes);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return null;
     }
@@ -121,11 +121,11 @@ public class ChatUniversalUtil {
             if (Objects.equals(base64, "0")) {
                 out.write("".getBytes());
             } else {
-                byte[] bytes = Base64.getDecoder().decode(base64);
-                out.write(bytes);
+                byte[] bytes = Base64.getDecoder().decode(base64);  // 将base64编码字符串转换为字节数组
+                out.write(bytes);   // 将字节数组写入文件
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return thisPath;
     }
@@ -154,10 +154,11 @@ public class ChatUniversalUtil {
      * @param iconPath 图标路径
      */
     public static void autoBarIcon(JButton button, String iconPath) {
+        // 构建jar时使用被注释的代码
         ImageIcon icon = new ImageIcon("src/main/resources/icons/" + iconPath);
-        // ImageIcon icon = new ImageIcon(ChatUniversalUtil.class.getResource("icons/" + iconPath));
-        Image img = icon.getImage();
-        button.setIcon(new ImageIcon(img));
+        // ImageIcon icon = new ImageIcon(Objects.requireNonNull(ChatUniversalUtil.class.getResource("icons/" + iconPath)));
+        Image img = icon.getImage();    // 得到Image对象
+        button.setIcon(new ImageIcon(img)); // 设置按钮图标
     }
 
     /**
@@ -169,9 +170,9 @@ public class ChatUniversalUtil {
      * @param listener 监听器
      */
     public static void setTLC(JButton button, String Tips, String command, ChatFrameListener listener) {
-        button.setToolTipText(Tips);
-        button.setActionCommand(command);
-        button.addActionListener(listener);
+        button.setToolTipText(Tips);        // 设置按钮提示
+        button.setActionCommand(command);   // 设置按钮命令
+        button.addActionListener(listener); // 设置按钮监听器
     }
 
     /**

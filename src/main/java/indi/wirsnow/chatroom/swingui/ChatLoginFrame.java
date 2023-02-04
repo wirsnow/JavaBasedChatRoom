@@ -13,14 +13,23 @@ import java.awt.*;
  */
 public class ChatLoginFrame {
 
-    private final JFrame mFrame;
-    private final ChatUniversalData chatUniversalData;
+    private final JFrame mFrame;        // 父窗口
+    private final ChatUniversalData chatUniversalData;  // 数据类
 
+    /**
+     * 构造函数
+     *
+     * @param mFrame            父窗口
+     * @param chatUniversalData 数据类
+     */
     public ChatLoginFrame(JFrame mFrame, ChatUniversalData chatUniversalData) {
         this.mFrame = mFrame;
         this.chatUniversalData = chatUniversalData;
     }
 
+    /**
+     * 登录框
+     */
     public void login() {
         JFrame frame = new JFrame("登录");
         JLabel userNameTip = new JLabel("用户名:");
@@ -52,7 +61,7 @@ public class ChatLoginFrame {
 
         // 登录按钮
         loginButton.setPreferredSize(new Dimension(100, 30));
-        loginButton.setVerticalAlignment(SwingConstants.BOTTOM);
+        loginButton.setVerticalAlignment(SwingConstants.BOTTOM);    // 设置按钮底部对齐
         loginButton.addActionListener(e -> {
             String userName;
             userName = userNameField.getText();
@@ -61,13 +70,16 @@ public class ChatLoginFrame {
             } else if (userName.contains(" ")) {
                 JOptionPane.showMessageDialog(frame, "用户名不能包含空格", "错误", JOptionPane.ERROR_MESSAGE);
             } else if (userName.equals("Server") || userName.equals("Server-MyUserName") || userName.equals("所有人")) {
-                JOptionPane.showMessageDialog(frame, "名称中含有非法字符", "错误", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "用户名含有非法字符", "错误", JOptionPane.ERROR_MESSAGE);
             } else {
+                // 成功获取用户名后，替换非法字符
                 userName = userName.replace("\\", "").replace("/", "")
                         .replace(":", "").replace("*", "")
                         .replace("?", "").replace("\"", "")
                         .replace("<", "").replace(">", "")
-                        .replace("|", "");  // 替换非法字符
+                        .replace("|", "");
+
+                // 设置用户名并关闭登录框
                 chatUniversalData.setUserName(userName);
                 frame.dispose();
                 mFrame.setTitle(userName);

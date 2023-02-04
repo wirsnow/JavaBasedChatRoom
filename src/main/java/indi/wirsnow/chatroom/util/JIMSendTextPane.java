@@ -6,17 +6,20 @@ import javax.swing.text.*;
 /**
  * @author : wirsnow
  * @date : 2023/1/26 20:28
- * @description : 实现自动换行的JTextPane子类, 原作者未知
+ * @description : 让JTextPane实现自动换行的子类, 原贴https://www.iteye.com/topic/1138181
  */
 public class JIMSendTextPane extends JTextPane {
-    // 构造函数
+
+    /**
+     * 重写JTextPane的构造方法
+     */
     public JIMSendTextPane() {
         super();
-        this.setEditorKit(new WarpEditorKit());
+        this.setEditorKit(new WarpEditorKit()); // 重写EditorKit
     }
 
     private static class WarpEditorKit extends StyledEditorKit {
-        private final ViewFactory defaultFactory = new WarpColumnFactory(); // 重写ViewFactory
+        private final ViewFactory defaultFactory = new WarpColumnFactory();
 
         @Override
         public ViewFactory getViewFactory() {
@@ -52,7 +55,6 @@ public class JIMSendTextPane extends JTextPane {
     }
 
     private static class WarpLabelView extends LabelView {
-
         public WarpLabelView(Element elem) {
             super(elem);
         }
